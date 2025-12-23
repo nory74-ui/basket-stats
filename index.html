@@ -1,0 +1,906 @@
+<!DOCTYPE html>
+<html lang="ja">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no, viewport-fit=cover">
+    <meta name="theme-color" content="#09090b">
+    <meta name="apple-mobile-web-app-capable" content="yes">
+    <title>Basketball Stats Pro v6.5.2</title>
+    
+    <style>
+        /* --- Core System --- */
+        :root {
+            --bg-app: #000000;
+            --bg-panel: #121212;
+            --bg-card: #1e1e1e;
+            --bg-hover: #2a2a2a;
+            
+            --text-main: #ffffff;
+            --text-muted: #a0a0a0;
+            
+            --primary: #3b82f6; 
+            --secondary: #ef4444;
+            --accent: #eab308;
+            --success: #22c55e;
+            
+            --border: 1px solid #333;
+            --radius: 8px;
+        }
+
+        * { box-sizing: border-box; -webkit-tap-highlight-color: transparent; outline: none; }
+        
+        body {
+            margin: 0; padding: 0;
+            font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, Helvetica, Arial, sans-serif;
+            background-color: var(--bg-app);
+            color: var(--text-main);
+            height: 100dvh; width: 100vw;
+            overflow: hidden;
+            display: flex; flex-direction: column;
+            user-select: none; -webkit-user-select: none;
+        }
+
+        /* --- Utilities --- */
+        .flex { display: flex; }
+        .flex-col { flex-direction: column; }
+        .items-center { align-items: center; }
+        .justify-center { justify-content: center; }
+        .justify-between { justify-content: space-between; }
+        .grow { flex-grow: 1; }
+        .w-full { width: 100%; }
+        .h-full { height: 100%; }
+        .text-center { text-align: center; }
+        .font-bold { font-weight: 700; }
+        .font-mono { font-family: "SF Mono", monospace; }
+        .text-xs { font-size: 11px; }
+        .text-sm { font-size: 13px; }
+        .text-lg { font-size: 18px; }
+        .text-xl { font-size: 20px; }
+        .text-2xl { font-size: 28px; }
+        .text-muted { color: var(--text-muted); }
+        .p-2 { padding: 0.5rem; }
+        .p-4 { padding: 1rem; }
+        .gap-1 { gap: 0.25rem; }
+        .gap-2 { gap: 0.5rem; }
+        .hidden { display: none !important; }
+        
+        .custom-scrollbar { overflow-y: auto; scrollbar-width: thin; scrollbar-color: #444 transparent; }
+        .custom-scrollbar::-webkit-scrollbar { width: 4px; }
+        .custom-scrollbar::-webkit-scrollbar-thumb { background: #444; border-radius: 4px; }
+
+        /* --- Inputs & Buttons --- */
+        .btn {
+            display: inline-flex; align-items: center; justify-content: center;
+            padding: 10px 12px; border-radius: var(--radius); cursor: pointer;
+            background: var(--bg-card); color: var(--text-main); border: var(--border);
+            transition: 0.1s; font-size: 13px; font-weight: 600;
+        }
+        .btn:active { transform: scale(0.96); filter: brightness(1.2); }
+        .btn-ghost { background: transparent; border-color: transparent; }
+        .btn-primary { background: var(--primary); border-color: var(--primary); color: white; }
+        .btn-success { background: var(--success); border-color: var(--success); color: black; }
+        .btn-danger { color: var(--secondary); border-color: rgba(239,68,68,0.3); }
+        
+        input, select {
+            background: var(--bg-card); border: var(--border); color: white;
+            padding: 10px; border-radius: var(--radius); width: 100%;
+            font-size: 14px;
+        }
+
+        /* --- Views Layout --- */
+        .view-container { height: 100%; width: 100%; overflow: hidden; display: flex; flex-direction: column; }
+
+        /* --- Setup / Team Edit --- */
+        .setup-panel {
+            max-width: 600px; width: 100%; margin: 0 auto;
+            padding: 20px; display: flex; flex-direction: column; gap: 16px;
+            overflow-y: auto;
+        }
+        .card { background: var(--bg-panel); border: var(--border); padding: 16px; border-radius: var(--radius); }
+        .list-item { 
+            display: flex; align-items: center; gap: 10px; 
+            padding: 8px; background: var(--bg-card); border-radius: 4px; margin-bottom: 6px; 
+        }
+
+        /* --- History View --- */
+        .history-item {
+            background: var(--bg-card); border: var(--border); padding: 12px; border-radius: var(--radius);
+            margin-bottom: 8px; display: flex; justify-content: space-between; align-items: center;
+        }
+        .history-score { font-family: var(--font-mono); font-size: 18px; font-weight: bold; }
+        .score-box { background: #000; padding: 4px 8px; border-radius: 4px; margin: 0 8px; }
+
+        /* --- Game: Main Layout --- */
+        .main-layout {
+            display: grid;
+            grid-template-rows: auto 1fr; 
+            height: 100%;
+        }
+
+        /* Scoreboard */
+        .scoreboard {
+            background: var(--bg-panel); border-bottom: var(--border);
+            padding: 10px 20px; display: grid; grid-template-columns: 1fr auto 1fr;
+            gap: 20px; align-items: flex-start; height: 160px; position: relative;
+        }
+        .team-display { display: flex; flex-direction: column; align-items: center; gap: 4px; height: 100%; justify-content: center; }
+        
+        .team-name-lg { font-size: 18px; font-weight: 700; letter-spacing: 0.5px; opacity: 0.9; text-align: center; max-width: 100%; }
+        .total-score { font-size: 56px; font-weight: 900; line-height: 1; font-family: var(--font-mono); margin: 4px 0; }
+        .home-color { color: var(--primary); }
+        .away-color { color: var(--secondary); }
+
+        /* Exit Button in Header */
+        .exit-btn {
+            position: absolute; top: 10px; right: 10px;
+            background: rgba(255,255,255,0.1); border: 1px solid rgba(255,255,255,0.1);
+            color: #ccc; font-size: 10px; padding: 4px 8px; border-radius: 4px; cursor: pointer; z-index: 10;
+        }
+        .exit-btn:hover { background: rgba(255,255,255,0.2); color: white; }
+
+        /* Indicators (Timeout/Foul) */
+        .indicator-row { display: flex; align-items: center; gap: 8px; margin-top: 2px; }
+        .indicator-label { font-size: 10px; font-weight: bold; color: var(--text-muted); width: 20px; text-align: right; }
+        
+        /* Foul Dots */
+        .dots-container { display: flex; gap: 4px; }
+        .dot { width: 8px; height: 8px; border-radius: 50%; background: #333; border: 1px solid #444; }
+        .dot.active-red { background: var(--secondary); border-color: var(--secondary); box-shadow: 0 0 4px var(--secondary); }
+
+        /* Timeout Button */
+        .to-btn {
+            display: flex; align-items: center; justify-content: center;
+            background: var(--bg-card); border: 1px solid #444;
+            color: #fff; font-size: 12px; font-weight: bold;
+            width: 32px; height: 20px; border-radius: 4px; cursor: pointer;
+        }
+        .to-btn:active { background: #333; }
+
+        /* Period Board */
+        .period-board {
+            display: flex; flex-direction: column; align-items: center; justify-content: center;
+            background: #000; border: var(--border); border-radius: 6px; padding: 8px 12px;
+            height: fit-content; align-self: center; width: 140px;
+        }
+        .period-control { font-size: 16px; font-weight: bold; color: var(--accent); cursor: pointer; margin-bottom: 6px; }
+        
+        /* Period Score Grid */
+        .period-grid {
+            display: grid; 
+            grid-template-columns: repeat(5, 1fr);
+            gap: 2px; width: 100%; text-align: center;
+        }
+        .pg-head { font-size: 9px; color: #666; font-family: monospace; margin-bottom: 2px; }
+        .pg-val { font-size: 13px; font-weight: bold; padding: 2px 0; font-family: var(--font-mono); }
+        .pg-val.home { color: var(--primary); }
+        .pg-val.away { color: var(--secondary); }
+
+        /* 5-Column Cockpit */
+        .cockpit-grid {
+            display: grid;
+            /* Log A | Roster A | Actions | Roster B | Log B */
+            grid-template-columns: 180px 220px 1fr 220px 180px;
+            height: 100%; overflow: hidden;
+            background: var(--bg-app);
+        }
+
+        .col-panel {
+            display: flex; flex-direction: column; border-right: var(--border);
+            overflow: hidden; background: var(--bg-panel);
+        }
+        .col-panel:last-child { border-right: none; }
+        .col-header {
+            padding: 6px; font-size: 10px; font-weight: bold; text-align: center;
+            background: var(--bg-card); border-bottom: var(--border); color: var(--text-muted);
+        }
+
+        /* Log Items */
+        .log-item {
+            padding: 4px 8px; border-bottom: 1px solid #222; font-size: 10px; display: flex; gap: 6px;
+        }
+        .log-time { color: #555; font-family: monospace; min-width: 28px; }
+        .log-txt { color: #ccc; }
+
+        /* Roster Items */
+        .player-row {
+            display: flex; align-items: center; padding: 8px; border-bottom: 1px solid #222; cursor: pointer; transition: 0.1s;
+        }
+        .player-row:hover { background: var(--bg-hover); }
+        
+        /* Selected State - More distinct */
+        .player-row.selected-a { 
+            background: var(--primary); color: white; 
+            box-shadow: inset 4px 0 0 white;
+        }
+        .player-row.selected-b { 
+            background: var(--secondary); color: white; 
+            box-shadow: inset 4px 0 0 white;
+        }
+        
+        .p-num { font-family: monospace; font-weight: bold; width: 24px; text-align: center; opacity: 0.7; }
+        .p-name { flex-grow: 1; font-weight: 600; white-space: nowrap; overflow: hidden; text-overflow: ellipsis; font-size: 12px; }
+        .p-stats { font-size: 9px; opacity: 0.8; display: flex; gap: 6px; font-family: var(--font-mono); }
+        .stat-badge { background: rgba(0,0,0,0.3); padding: 1px 4px; border-radius: 2px; }
+
+        /* Action Center */
+        .action-area { background: var(--bg-app); display: flex; flex-direction: column; }
+        .target-bar {
+            height: 36px; display: flex; align-items: center; justify-content: center;
+            border-bottom: var(--border); background: var(--bg-card);
+            font-weight: bold; font-size: 12px;
+        }
+        .target-badge { padding: 3px 12px; border-radius: 12px; background: #333; color: #fff; }
+        
+        .action-buttons {
+            flex: 1; padding: 8px;
+            display: grid;
+            grid-template-columns: 1fr 1fr;
+            grid-template-rows: repeat(6, 1fr);
+            gap: 6px;
+        }
+        .act-btn {
+            background: linear-gradient(180deg, #2a2a2a, #202020);
+            border: 1px solid #333; border-radius: 6px;
+            display: flex; flex-direction: column; align-items: center; justify-content: center;
+            cursor: pointer; position: relative; box-shadow: 0 3px 0 #111;
+            transition: transform 0.05s, box-shadow 0.05s;
+        }
+        .act-btn:active { transform: translateY(3px); box-shadow: none; }
+        
+        .act-btn.make { border-color: #22c55e; color: #22c55e; }
+        .act-btn.miss { border-color: #ef4444; color: #ef4444; }
+        .act-btn span:first-child { font-size: 16px; font-weight: 900; }
+        .act-btn span:last-child { font-size: 9px; font-weight: 600; opacity: 0.8; margin-top: 1px; }
+
+        /* Table Style */
+        table { width: 100%; border-collapse: collapse; font-size: 12px; }
+        th { text-align: left; padding: 8px; background: var(--bg-card); color: var(--text-muted); border-bottom: var(--border); position: sticky; top: 0; }
+        td { padding: 8px; border-bottom: 1px solid #222; }
+        .num-cell { text-align: right; font-family: var(--font-mono); }
+
+        /* Mobile Fallback */
+        @media (max-width: 1024px) {
+            .cockpit-grid { display: flex; flex-direction: column; }
+            .scoreboard { padding: 6px; gap: 6px; height: auto; grid-template-columns: 1fr 1fr; }
+            .scoreboard > button { top: 4px; right: 4px; }
+            .period-board { grid-column: span 2; order: 3; width: 100%; height: auto; }
+            .team-name-lg { font-size: 15px; }
+            .total-score { font-size: 28px; }
+            .period-grid { display: none; }
+            
+            .col-panel, .action-area { display: none; flex: 1; }
+            .col-panel.mobile-active, .action-area.mobile-active { display: flex; }
+            
+            .mobile-tabs { display: flex; height: 48px; background: #111; border-top: var(--border); }
+            .tab-btn { flex: 1; text-align: center; line-height: 48px; color: #666; font-weight: bold; cursor: pointer; font-size: 11px; }
+            .tab-btn.active { color: white; background: #222; }
+        }
+        @media (min-width: 1025px) { .mobile-tabs { display: none; } }
+
+        /* Icons */
+        .icon { width: 14px; height: 14px; fill: none; stroke: currentColor; stroke-width: 2; stroke-linecap: round; stroke-linejoin: round; }
+    </style>
+</head>
+<body>
+    <div id="root" class="w-full h-full"></div>
+
+    <script>
+        // --- Utils ---
+        const $ = (s) => document.querySelector(s);
+        const genId = () => Math.random().toString(36).substr(2, 9);
+        const nowTime = () => new Date().toTimeString().slice(0,5);
+        const today = () => new Date().toISOString().slice(0,10);
+        
+        // --- Icons ---
+        const Icons = {
+            Undo: `<svg class="icon"><path d="M9 14 4 9l5-5"/><path d="M4 9h10.5a5.5 5.5 0 0 1 5.5 5.5v0a5.5 5.5 0 0 1-5.5 5.5H11"/></svg>`,
+            Trash: `<svg class="icon"><polyline points="3 6 5 6 21 6"/><path d="M19 6v14a2 2 0 0 1-2 2H7a2 2 0 0 1-2-2V6m3 0V4a2 2 0 0 1 2-2h4a2 2 0 0 1 2 2v2"/></svg>`,
+            Refresh: `<svg class="icon"><path d="M23 4v6h-6"/><path d="M20.49 15a9 9 0 1 1-2.12-9.36L23 10"/></svg>`,
+            Plus: `<svg class="icon"><line x1="12" y1="5" x2="12" y2="19"/><line x1="5" y1="12" x2="19" y2="12"/></svg>`,
+            List: `<svg class="icon"><line x1="8" y1="6" x2="21" y2="6"/><line x1="8" y1="12" x2="21" y2="12"/><line x1="8" y1="18" x2="21" y2="18"/><line x1="3" y1="6" x2="3.01" y2="6"/><line x1="3" y1="12" x2="3.01" y2="12"/><line x1="3" y1="18" x2="3.01" y2="18"/></svg>`,
+            Download: `<svg class="icon"><path d="M21 15v4a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2v-4"/><polyline points="7 10 12 15 17 10"/><line x1="12" y1="15" x2="12" y2="3"/></svg>`,
+            Exit: `<svg class="icon"><path d="M9 21H5a2 2 0 0 1-2-2V5a2 2 0 0 1 2-2h4"/><polyline points="16 17 21 12 16 7"/><line x1="21" y1="12" x2="9" y2="12"/></svg>`
+        };
+
+        // --- State ---
+        var State = {
+            view: 'SETUP', // SETUP, HISTORY, HISTORY_DETAIL, EDIT_LIST, EDIT_TEAM, GAME
+            teams: [],
+            history: [],
+            editTeamId: null,
+            viewHistoryId: null,
+            match: null, 
+            target: { side: null, id: null },
+            mobileTab: 'CENTER',
+            subModal: false,
+            endModal: false
+        };
+
+        // --- Data Persistence ---
+        var load = () => {
+            const dt = localStorage.getItem('bst_v6_data');
+            const dh = localStorage.getItem('bst_v6_history');
+            if(dt) State.teams = JSON.parse(dt);
+            else {
+                State.teams = [
+                    {id:genId(), name:'HOME Team', players:genPlayers()},
+                    {id:genId(), name:'AWAY Team', players:genPlayers()}
+                ];
+                saveTeams();
+            }
+            if(dh) State.history = JSON.parse(dh);
+        };
+        var saveTeams = () => localStorage.setItem('bst_v6_data', JSON.stringify(State.teams));
+        var saveHistory = () => localStorage.setItem('bst_v6_history', JSON.stringify(State.history));
+        
+        var genPlayers = () => Array.from({length:5}, (_,i)=>({id:genId(), name:`Player ${4+i}`, number:`${4+i}`})).concat([{id:genId(), name:'Bench 10', number:'10'}]);
+
+        // --- Actions ---
+        var Act = {
+            setView: (v) => { State.view = v; Render(); },
+
+            // History
+            deleteHistory: (id) => {
+                if(confirm('この履歴を削除しますか？')) {
+                    State.history = State.history.filter(h => h.id !== id);
+                    saveHistory();
+                    if(State.viewHistoryId === id) Act.setView('HISTORY');
+                    else Render();
+                }
+            },
+            viewHistory: (id) => { State.viewHistoryId = id; Act.setView('HISTORY_DETAIL'); },
+            
+            // Export
+            exportOne: (id) => {
+                const m = State.history.find(h => h.id === id);
+                if(!m) return;
+                const csv = generateMatchCSV(m);
+                copyToClipboard(csv);
+            },
+            exportAll: () => {
+                let allCsv = "";
+                State.history.forEach(m => {
+                    allCsv += generateMatchCSV(m) + "\n\n" + "=".repeat(20) + "\n\n";
+                });
+                copyToClipboard(allCsv);
+            },
+
+            // Team Mgmt
+            createTeam: () => {
+                const newTeam = { id: genId(), name: 'New Team', players: genPlayers() };
+                State.teams.push(newTeam); saveTeams(); Act.editTeam(newTeam.id);
+            },
+            editTeam: (id) => { State.editTeamId = id; State.view = 'EDIT_TEAM'; Render(); },
+            deleteTeam: (id) => { if(confirm('削除しますか？')) { State.teams=State.teams.filter(t=>t.id!==id); saveTeams(); Render(); } },
+            updateTeamName: (val) => { State.teams.find(t=>t.id===State.editTeamId).name = val; saveTeams(); },
+            addPlayer: () => { State.teams.find(t=>t.id===State.editTeamId).players.push({id:genId(), name:'New Player', number:''}); saveTeams(); Render(); },
+            removePlayer: (pid) => { const t=State.teams.find(t=>t.id===State.editTeamId); t.players=t.players.filter(p=>p.id!==pid); saveTeams(); Render(); },
+            updatePlayer: (pid, key, val) => { const t=State.teams.find(t=>t.id===State.editTeamId); const p=t.players.find(p=>p.id===pid); if(p){p[key]=val; saveTeams();} },
+
+            // Match Logic
+            start: () => {
+                const hid = $('#sel-home').value;
+                const aid = $('#sel-away').value;
+                if(!hid || !aid) return alert('チームを選択してください');
+                
+                const h = State.teams.find(t=>t.id===hid);
+                const a = State.teams.find(t=>t.id===aid);
+                
+                State.match = {
+                    id: genId(),
+                    info: { date:$('#inp-date').value, title:$('#inp-title').value },
+                    A: { ...h, players: h.players.map(p=>({...p, isOnCourt:true, stats:initStats()})) },
+                    B: { ...a, players: a.players.map(p=>({...p, isOnCourt:true, stats:initStats()})) },
+                    log: [], history: [], period: 1,
+                    timeouts: { A: 0, B: 0 } 
+                };
+                State.match.A.players.forEach((p,i)=>{p.isOnCourt=i<5});
+                State.match.B.players.forEach((p,i)=>{p.isOnCourt=i<5});
+                State.view = 'GAME'; Render();
+            },
+            
+            sel: (s, id) => { State.target = (State.target.id === id) ? {side:null, id:null} : {side:s, id:id}; Render(); },
+
+            stat: (k) => {
+                if(!State.target.side) return alert('選手またはチームを選択してください');
+                const m = State.match;
+                
+                // History push
+                m.history.push(JSON.stringify({A:m.A, B:m.B, log:m.log, period:m.period, timeouts:m.timeouts}));
+                
+                const s = State.target.side;
+                const tm = m[s];
+                const pl = tm.players.find(p => p.id === State.target.id);
+                
+                // If a specific player is selected, use their stats object.
+                // If not (team only), we still calculate points for team score, but don't add to any player stats.
+                const st = pl ? pl.stats : null;
+                
+                let pts = 0;
+                if(k.includes('3PM')) { pts=3; if(st){st.fgm++; st.fga++; st.tpm++; st.tpa++;} }
+                else if(k.includes('3PX')) { if(st){st.fga++; st.tpa++;} }
+                else if(k.includes('2PM')) { pts=2; if(st){st.fgm++; st.fga++;} }
+                else if(k.includes('2PX')) { if(st){st.fga++;} }
+                else if(k.includes('FTM')) { pts=1; if(st){st.ftm++; st.fta++;} }
+                else if(k.includes('FTX')) { if(st){st.fta++;} }
+                else if(k==='ORB') { if(st) st.orb++; }
+                else if(k==='DRB') { if(st) st.drb++; }
+                else if(k==='AST') { if(st) st.ast++; }
+                else if(k==='TOV') { if(st) st.tov++; }
+                else if(k==='PF') { if(st) st.pf++; }
+                
+                // Add points to individual stats if player exists
+                if(pts > 0 && st) st.pts += pts;
+
+                m.log.unshift({
+                    id: genId(), time: nowTime(), period: m.period,
+                    side: s, pts: pts, isFoul: k === 'PF',
+                    txt: `${pl?`#${pl.number}`:'TEAM'} ${k}`
+                });
+                Render();
+            },
+
+            setPeriod: (p) => { State.match.period = p > 4 ? (p>5?1:5) : p; Render(); },
+
+            timeout: (side) => {
+                const m = State.match;
+                m.timeouts[side]++; // Count up
+                Render();
+            },
+
+            undo: () => {
+                if(State.match.history.length) {
+                    const p = JSON.parse(State.match.history.pop());
+                    State.match.A = p.A; State.match.B = p.B; State.match.log = p.log; 
+                    State.match.period = p.period; State.match.timeouts = p.timeouts;
+                    Render();
+                }
+            },
+
+            // Game Control
+            openEnd: () => { State.endModal = true; Render(); },
+            closeEnd: () => { State.endModal = false; Render(); },
+            
+            finish: (save) => {
+                if(save) {
+                    const sc = calcScores(State.match);
+                    const finalMatch = {
+                        ...State.match,
+                        history: [], // Remove undo history
+                        finalScore: { A: sc.At, B: sc.Bt, detail: sc }
+                    };
+                    State.history.unshift(finalMatch);
+                    saveHistory();
+                    alert('試合結果を保存しました。');
+                }
+                State.match = null;
+                State.endModal = false;
+                State.view = 'SETUP';
+                Render();
+            },
+
+            // Sub
+            openSub: () => { State.subModal = true; Render(); },
+            execSub: (side, outId, inId) => {
+                const t = State.match[side];
+                t.players.find(p=>p.id===outId).isOnCourt = false;
+                t.players.find(p=>p.id===inId).isOnCourt = true;
+                State.match.log.unshift({time:nowTime(), period:State.match.period, side:side, txt:`SUB IN #${t.players.find(p=>p.id===inId).number}`});
+                State.subModal = false;
+                Render();
+            }
+        };
+
+        var initStats = () => ({pts:0, fgm:0, fga:0, tpm:0, tpa:0, ftm:0, fta:0, orb:0, drb:0, ast:0, tov:0, pf:0});
+
+        var calcScores = (m) => {
+            const scores = {A:[0,0,0,0,0], B:[0,0,0,0,0], At:0, Bt:0}; 
+            m.log.forEach(l => {
+                if(l.pts) {
+                    const idx = l.period - 1;
+                    if(idx >= 0 && idx <= 4) scores[l.side][idx] += l.pts;
+                    scores[l.side+'t'] += l.pts;
+                }
+            });
+            return scores;
+        };
+
+        var calcTeamFouls = (m) => {
+            const f = {A:0, B:0};
+            m.log.forEach(l => { if(l.period === m.period && (l.isFoul || l.txt.includes('PF'))) f[l.side]++; });
+            return f;
+        };
+
+        var generateMatchCSV = (m) => {
+            let tsv = `DATE,${m.info.date}\nTITLE,${m.info.title}\n\n`;
+            ['A', 'B'].forEach(s => {
+                const t = m[s];
+                tsv += `TEAM,${t.name}\n`;
+                tsv += `No,Name,PTS,REB,AST,TOV,PF,FGM,FGA,3PM,3PA,FTM,FTA\n`;
+                t.players.forEach(p => {
+                    if(p.stats.pts + p.stats.fga + p.stats.pf + p.stats.tov > 0 || p.isOnCourt) {
+                        const st = p.stats;
+                        tsv += `${p.number},${p.name},${st.pts},${st.orb+st.drb},${st.ast},${st.tov},${st.pf},${st.fgm},${st.fga},${st.tpm},${st.tpa},${st.ftm},${st.fta}\n`;
+                    }
+                });
+                const l = m.log.filter(x=>x.side===s);
+                const pts = l.reduce((a,b)=>a+(b.pts||0),0);
+                tsv += `TOTAL,,${pts}\n\n`;
+            });
+            return tsv;
+        };
+
+        var copyToClipboard = (text) => {
+            const el = document.createElement("textarea"); el.value = text;
+            document.body.appendChild(el); el.select(); document.execCommand('copy'); document.body.removeChild(el);
+            alert('クリップボードにCSV形式でコピーしました。\nExcel等に貼り付けてください。');
+        };
+
+        // --- Views ---
+        var Render = () => {
+            const root = $('#root');
+            switch(State.view) {
+                case 'SETUP': root.innerHTML = SetupView(); break;
+                case 'HISTORY': root.innerHTML = HistoryListView(); break;
+                case 'HISTORY_DETAIL': root.innerHTML = HistoryDetailView(); break;
+                case 'EDIT_LIST': root.innerHTML = TeamListView(); break;
+                case 'EDIT_TEAM': root.innerHTML = TeamEditView(); break;
+                case 'GAME': root.innerHTML = GameView(); break;
+            }
+        };
+
+        var SetupView = () => `
+            <div class="view-container items-center justify-center p-4">
+                <h1 class="text-2xl font-bold mb-6">BASKETBALL STATS PRO v6.5.2</h1>
+                <div class="setup-panel border border-[#333] rounded-lg bg-panel">
+                    <div class="mb-4">
+                        <label class="text-xs text-muted">INFO</label>
+                        <input id="inp-date" type="date" value="${today()}">
+                        <input id="inp-title" class="mt-2" value="Official Game">
+                    </div>
+                    <div class="mb-6">
+                        <label class="text-xs text-muted">TEAMS</label>
+                        <div class="flex gap-2 items-center">
+                            <select id="sel-home">${State.teams.map(t=>`<option value="${t.id}">${t.name}</option>`)}</select>
+                            <span class="font-bold text-muted">VS</span>
+                            <select id="sel-away">${State.teams.map(t=>`<option value="${t.id}">${t.name}</option>`)}</select>
+                        </div>
+                    </div>
+                    <button onclick="Act.start()" class="btn btn-primary w-full p-3 text-lg mb-4">GAME START</button>
+                    
+                    <div class="grid grid-cols-2 gap-2 border-t border-[#333] pt-4">
+                         <button onclick="Act.setView('HISTORY')" class="btn text-muted border-dashed">${Icons.List} 履歴・分析 (HISTORY)</button>
+                         <button onclick="Act.setView('EDIT_LIST')" class="btn text-muted border-dashed">チーム管理 (TEAMS)</button>
+                    </div>
+                </div>
+            </div>
+        `;
+
+        var HistoryListView = () => `
+            <div class="view-container p-4">
+                <div class="setup-panel h-full">
+                    <div class="flex justify-between items-center mb-4">
+                        <h2 class="font-bold text-xl">試合履歴</h2>
+                        <div class="flex gap-2">
+                            <button onclick="Act.exportAll()" class="btn btn-success text-xs">${Icons.Download} 全データ出力</button>
+                            <button onclick="Act.setView('SETUP')" class="btn">戻る</button>
+                        </div>
+                    </div>
+                    <div class="custom-scrollbar grow">
+                        ${State.history.length === 0 ? '<div class="text-muted text-center p-4">履歴がありません</div>' : ''}
+                        ${State.history.map(h => `
+                            <div class="history-item">
+                                <div class="flex-1 cursor-pointer" onclick="Act.viewHistory('${h.id}')">
+                                    <div class="text-xs text-muted">${h.info.date}</div>
+                                    <div class="font-bold text-sm mb-1">${h.info.title}</div>
+                                    <div class="flex items-center">
+                                        <span class="text-primary font-bold">${h.A.name}</span>
+                                        <span class="score-box">${h.finalScore.A} - ${h.finalScore.B}</span>
+                                        <span class="text-secondary font-bold">${h.B.name}</span>
+                                    </div>
+                                </div>
+                                <button onclick="Act.deleteHistory('${h.id}')" class="btn btn-ghost text-muted">${Icons.Trash}</button>
+                            </div>
+                        `).join('')}
+                    </div>
+                </div>
+            </div>
+        `;
+
+        var HistoryDetailView = () => {
+            const m = State.history.find(h => h.id === State.viewHistoryId);
+            if(!m) return Act.setView('HISTORY');
+            
+            const StatTable = (side) => {
+                const t = m[side];
+                return `
+                    <div class="mb-4">
+                        <div class="font-bold mb-1 text-xs" style="color:${side==='A'?'var(--primary)':'var(--secondary)'}">${t.name}</div>
+                        <table>
+                            <thead><tr><th># Name</th><th>PTS</th><th>REB</th><th>AST</th><th>FGM/A</th><th>3PM/A</th><th>FTM/A</th><th>PF</th></tr></thead>
+                            <tbody>
+                                ${t.players.map(p => {
+                                    if(p.stats.pts+p.stats.fga+p.stats.pf === 0 && !p.isOnCourt) return '';
+                                    const s = p.stats;
+                                    return `<tr>
+                                        <td>${p.number} ${p.name}</td>
+                                        <td class="num-cell font-bold">${s.pts}</td>
+                                        <td class="num-cell">${s.orb+s.drb}</td>
+                                        <td class="num-cell">${s.ast}</td>
+                                        <td class="num-cell">${s.fgm}/${s.fga}</td>
+                                        <td class="num-cell">${s.tpm}/${s.tpa}</td>
+                                        <td class="num-cell">${s.ftm}/${s.fta}</td>
+                                        <td class="num-cell">${s.pf}</td>
+                                    </tr>`;
+                                }).join('')}
+                            </tbody>
+                        </table>
+                    </div>
+                `;
+            };
+
+            return `
+            <div class="view-container p-4">
+                <div class="setup-panel h-full" style="max-width:800px;">
+                    <div class="flex justify-between items-center mb-4">
+                        <div>
+                            <div class="text-xs text-muted">${m.info.date}</div>
+                            <div class="font-bold text-lg">${m.info.title}</div>
+                        </div>
+                        <div class="flex gap-2">
+                            <button onclick="Act.exportOne('${m.id}')" class="btn btn-success text-xs">${Icons.Download} CSV出力</button>
+                            <button onclick="Act.setView('HISTORY')" class="btn">戻る</button>
+                        </div>
+                    </div>
+                    <div class="bg-card p-4 rounded text-center mb-4 text-2xl font-black font-mono">
+                        <span class="text-primary">${m.A.name}</span>
+                        <span class="mx-4">${m.finalScore.A} - ${m.finalScore.B}</span>
+                        <span class="text-secondary">${m.B.name}</span>
+                    </div>
+                    <div class="custom-scrollbar grow">
+                        ${StatTable('A')}
+                        ${StatTable('B')}
+                    </div>
+                </div>
+            </div>
+            `;
+        };
+
+        var TeamListView = () => `
+            <div class="view-container p-4">
+                <div class="setup-panel h-full">
+                    <div class="flex justify-between items-center mb-4">
+                        <h2 class="font-bold text-xl">チーム管理</h2>
+                        <button onclick="Act.setView('SETUP')" class="btn">戻る</button>
+                    </div>
+                    <button onclick="Act.createTeam()" class="btn btn-primary w-full mb-4">+ 新規チーム作成</button>
+                    <div class="custom-scrollbar grow">
+                        ${State.teams.map(t => `
+                            <div class="card mb-2 flex justify-between items-center">
+                                <span class="font-bold">${t.name}</span>
+                                <div class="flex gap-2">
+                                    <button onclick="Act.editTeam('${t.id}')" class="btn text-xs">編集</button>
+                                    <button onclick="Act.deleteTeam('${t.id}')" class="btn btn-danger text-xs">削除</button>
+                                </div>
+                            </div>
+                        `).join('')}
+                    </div>
+                </div>
+            </div>
+        `;
+
+        var TeamEditView = () => {
+            const t = State.teams.find(x => x.id === State.editTeamId);
+            return `
+            <div class="view-container p-4">
+                <div class="setup-panel h-full">
+                    <div class="flex justify-between items-center mb-4">
+                        <h2 class="font-bold text-lg">チーム編集</h2>
+                        <button onclick="Act.setView('EDIT_LIST')" class="btn">完了</button>
+                    </div>
+                    <div class="mb-4">
+                        <label class="text-xs text-muted">チーム名</label>
+                        <input value="${t.name}" oninput="Act.updateTeamName(this.value)" class="text-lg font-bold">
+                    </div>
+                    <div class="flex justify-between items-center mb-2">
+                        <span class="text-xs text-muted">メンバー (${t.players.length})</span>
+                        <button onclick="Act.addPlayer()" class="btn text-xs">${Icons.Plus} 追加</button>
+                    </div>
+                    <div class="custom-scrollbar grow">
+                        ${t.players.map(p => `
+                            <div class="list-item">
+                                <input value="${p.number}" placeholder="#" onchange="Act.updatePlayer('${p.id}','number',this.value)" style="width:50px; text-align:center">
+                                <input value="${p.name}" placeholder="名前" onchange="Act.updatePlayer('${p.id}','name',this.value)" style="flex:1">
+                                <button onclick="Act.removePlayer('${p.id}')" class="btn btn-ghost text-muted">${Icons.Trash}</button>
+                            </div>
+                        `).join('')}
+                    </div>
+                </div>
+            </div>
+            `;
+        };
+
+        var GameView = () => {
+            const m = State.match;
+            const t = State.target;
+            const sc = calcScores(m);
+            const tf = calcTeamFouls(m);
+
+            // Sub Modal
+            let subHTML = '';
+            if(State.subModal) {
+                const s = t.side || 'A';
+                const tm = m[s];
+                subHTML = `
+                    <div class="fixed inset-0 bg-black/80 flex items-center justify-center z-50">
+                        <div class="bg-card w-11/12 max-w-md p-4 rounded border border-[#444]">
+                            <h3 class="font-bold mb-4">SUBSTITUTION: ${tm.name}</h3>
+                            <div class="flex gap-2 h-64">
+                                <div class="flex-1 overflow-y-auto border-r border-[#333]">
+                                    <div class="text-xs text-secondary text-center font-bold">OUT</div>
+                                    ${tm.players.filter(p=>p.isOnCourt).map(p=>`<button onclick="window.subOut='${p.id}'; this.style.background='var(--secondary)'" class="btn w-full mb-1 justify-between">${p.number} ${p.name}</button>`).join('')}
+                                </div>
+                                <div class="flex-1 overflow-y-auto">
+                                    <div class="text-xs text-primary text-center font-bold">IN</div>
+                                    ${tm.players.filter(p=>!p.isOnCourt).map(p=>`<button onclick="window.subIn='${p.id}'; this.style.background='var(--primary)'" class="btn w-full mb-1 justify-between">${p.number} ${p.name}</button>`).join('')}
+                                </div>
+                            </div>
+                            <div class="flex gap-2 mt-4">
+                                <button onclick="State.subModal=false;Render()" class="btn flex-1">CANCEL</button>
+                                <button onclick="if(window.subOut&&window.subIn) Act.execSub('${s}',window.subOut,window.subIn)" class="btn btn-primary flex-1">CONFIRM</button>
+                            </div>
+                        </div>
+                    </div>
+                `;
+            }
+
+            // End Modal
+            if(State.endModal) {
+                subHTML = `
+                    <div class="fixed inset-0 bg-black/90 flex items-center justify-center z-50">
+                        <div class="bg-card w-full max-w-sm p-6 rounded border border-[#444] text-center">
+                            <h3 class="font-bold text-xl mb-2 text-white">試合終了 (GAME END)</h3>
+                            <p class="text-muted text-sm mb-6">試合結果を保存してメニューに戻りますか？</p>
+                            <div class="flex flex-col gap-3">
+                                <button onclick="Act.finish(true)" class="btn btn-primary w-full p-3">保存して終了 (SAVE & END)</button>
+                                <button onclick="Act.finish(false)" class="btn btn-danger w-full p-3">保存せずに破棄 (DISCARD)</button>
+                                <button onclick="Act.closeEnd()" class="btn btn-ghost w-full p-3">キャンセル (CANCEL)</button>
+                            </div>
+                        </div>
+                    </div>
+                `;
+            }
+
+            // Period Table Rows (Home/Away separated)
+            const PeriodRows = () => {
+                const sA = sc['A'];
+                const sB = sc['B'];
+                let header = `<div class="pg-head">1</div><div class="pg-head">2</div><div class="pg-head">3</div><div class="pg-head">4</div><div class="pg-head">OT</div>`;
+                let rowA = `<div class="pg-val home">${sA[0]}</div><div class="pg-val home">${sA[1]}</div><div class="pg-val home">${sA[2]}</div><div class="pg-val home">${sA[3]}</div><div class="pg-val home">${sA[4]}</div>`;
+                let rowB = `<div class="pg-val away">${sB[0]}</div><div class="pg-val away">${sB[1]}</div><div class="pg-val away">${sB[2]}</div><div class="pg-val away">${sB[3]}</div><div class="pg-val away">${sB[4]}</div>`;
+                return header + rowA + rowB;
+            };
+
+            const Indicators = (side, count, colorClass) => {
+                let dots = '';
+                for(let i=0; i<5; i++) {
+                    dots += `<div class="dot ${i < count ? colorClass : ''}"></div>`;
+                }
+                return dots;
+            };
+
+            const Roster = (side) => {
+                const tm = m[side];
+                const color = side==='A'?'selected-a':'selected-b';
+                return tm.players.filter(p=>p.isOnCourt).map(p => `
+                    <div onclick="Act.sel('${side}','${p.id}')" class="player-row ${t.id===p.id?color:''}">
+                        <div class="p-num">${p.number}</div>
+                        <div class="p-name">${p.name}</div>
+                        <div class="p-stats">
+                            <span class="stat-badge">PTS:${p.stats.pts}</span>
+                            <span class="stat-badge">F:${p.stats.pf}</span>
+                        </div>
+                    </div>
+                `).join('') + `<div class="p-2 text-center"><button onclick="State.target.side='${side}';Act.openSub()" class="btn btn-ghost text-xs text-muted w-full border border-dashed border-[#333]">SUBSTITUTION</button></div>`;
+            };
+
+            const Logs = (side) => m.log.filter(l=>l.side===side).map(l => `<div class="log-item"><span class="log-time">${l.time}</span><span class="log-txt">${l.txt}</span></div>`).join('');
+
+            return `
+                ${subHTML}
+                <div class="main-layout">
+                    <!-- SCOREBOARD -->
+                    <div class="scoreboard">
+                        <button onclick="Act.openEnd()" class="exit-btn flex items-center gap-1">${Icons.Exit} EXIT</button>
+                        
+                        <!-- HOME -->
+                        <div class="team-display home-color">
+                            <div class="team-name-lg truncate">${m.A.name}</div>
+                            <div class="total-score">${sc.At}</div>
+                            <div class="indicator-row" style="cursor:pointer">
+                                <div class="indicator-label">TO</div>
+                                <button onclick="Act.timeout('A')" class="to-btn">${m.timeouts.A}</button>
+                            </div>
+                            <div class="indicator-row">
+                                <div class="indicator-label">TF</div>
+                                <div class="dots-container">${Indicators('A', tf.A, 'active-red')}</div>
+                            </div>
+                        </div>
+
+                        <div class="period-board">
+                            <div onclick="Act.setPeriod(${m.period+1})" class="period-control">Q${m.period} ▶</div>
+                            <div class="period-grid">
+                                ${PeriodRows()}
+                            </div>
+                        </div>
+
+                        <!-- AWAY -->
+                        <div class="team-display right away-color">
+                            <div class="team-name-lg truncate">${m.B.name}</div>
+                            <div class="total-score">${sc.Bt}</div>
+                            <div class="indicator-row" style="flex-direction:row-reverse">
+                                <div class="indicator-label">TO</div>
+                                <button onclick="Act.timeout('B')" class="to-btn">${m.timeouts.B}</button>
+                            </div>
+                            <div class="indicator-row" style="flex-direction:row-reverse">
+                                <div class="indicator-label">TF</div>
+                                <div class="dots-container">${Indicators('B', tf.B, 'active-red')}</div>
+                            </div>
+                        </div>
+                    </div>
+
+                    <!-- 5-COL COCKPIT -->
+                    <div class="cockpit-grid">
+                        <div class="col-panel ${State.mobileTab==='LEFT'?'mobile-active':''}"><div class="col-header">HOME LOG</div><div class="custom-scrollbar grow">${Logs('A')}</div></div>
+                        <div class="col-panel ${State.mobileTab==='LEFT'?'mobile-active':''}"><div class="col-header">HOME ROSTER</div><div class="custom-scrollbar grow">${Roster('A')}</div></div>
+
+                        <div class="action-area ${State.mobileTab==='CENTER'?'mobile-active':''}">
+                            <div class="target-bar">
+                                ${t.side ? `<div class="target-badge" style="background:${t.side==='A'?'var(--primary)':'var(--secondary)'}">${t.id?m[t.side].players.find(p=>p.id===t.id).name:m[t.side].name}</div>` : `<span class="text-muted text-xs tracking-widest">SELECT TARGET</span>`}
+                            </div>
+                            <div class="action-buttons">
+                                <!-- Row 1 -->
+                                <button onclick="Act.stat('3PM')" class="act-btn make"><span>3P</span><span>MAKE</span></button>
+                                <button onclick="Act.stat('3PX')" class="act-btn miss"><span>3P</span><span>MISS</span></button>
+                                <!-- Row 2 -->
+                                <button onclick="Act.stat('2PM')" class="act-btn make"><span>2P</span><span>MAKE</span></button>
+                                <button onclick="Act.stat('2PX')" class="act-btn miss"><span>2P</span><span>MISS</span></button>
+                                <!-- Row 3 -->
+                                <button onclick="Act.stat('FTM')" class="act-btn make"><span>FT</span><span>MAKE</span></button>
+                                <button onclick="Act.stat('FTX')" class="act-btn miss"><span>FT</span><span>MISS</span></button>
+                                <!-- Row 4 -->
+                                <button onclick="Act.stat('ORB')" class="act-btn"><span>ORB</span><span>OFF.REB</span></button>
+                                <button onclick="Act.stat('DRB')" class="act-btn"><span>DRB</span><span>DEF.REB</span></button>
+                                <!-- Row 5 -->
+                                <button onclick="Act.stat('AST')" class="act-btn"><span>AST</span><span>ASSIST</span></button>
+                                <button onclick="Act.stat('TOV')" class="act-btn"><span>TOV</span><span>TURNOVER</span></button>
+                                <!-- Row 6 -->
+                                <button onclick="Act.stat('PF')" class="act-btn" style="border-color:var(--accent); color:var(--accent)"><span>FOUL</span><span>PF</span></button>
+                                <button onclick="Act.openSub()" class="act-btn text-muted"><span>SUB</span><span>CHANGE</span></button>
+                            </div>
+                            <div class="flex p-2 gap-2 border-t border-[#333] bg-panel">
+                                <button onclick="Act.undo()" class="btn grow text-muted">${Icons.Undo} UNDO</button>
+                                <button onclick="Act.openEnd()" class="btn grow text-muted">${Icons.Refresh} END</button>
+                            </div>
+                        </div>
+
+                        <div class="col-panel ${State.mobileTab==='RIGHT'?'mobile-active':''}"><div class="col-header">AWAY ROSTER</div><div class="custom-scrollbar grow">${Roster('B')}</div></div>
+                        <div class="col-panel ${State.mobileTab==='RIGHT'?'mobile-active':''}"><div class="col-header">AWAY LOG</div><div class="custom-scrollbar grow">${Logs('B')}</div></div>
+                    </div>
+
+                    <div class="mobile-tabs">
+                        <div onclick="State.mobileTab='LEFT';Render()" class="tab-btn ${State.mobileTab==='LEFT'?'active':''}">HOME</div>
+                        <div onclick="State.mobileTab='CENTER';Render()" class="tab-btn ${State.mobileTab==='CENTER'?'active':''}">INPUT</div>
+                        <div onclick="State.mobileTab='RIGHT';Render()" class="tab-btn ${State.mobileTab==='RIGHT'?'active':''}">AWAY</div>
+                    </div>
+                </div>
+            `;
+        };
+
+        // Init
+        load();
+        window.addEventListener('resize', Render);
+        Render();
+    </script>
+</body>
+</html>
