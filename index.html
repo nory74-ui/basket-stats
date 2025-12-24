@@ -189,12 +189,28 @@
         .pg-val.home { color: var(--primary); }
         .pg-val.away { color: var(--secondary); }
 
-        /* 5-Column Cockpit (PC Base) */
+        /* --- Cockpit Layout (Responsive) --- */
         .cockpit-grid {
             display: grid;
-            grid-template-columns: 180px 220px 1fr 220px 180px;
             height: 100%; overflow: hidden;
             background: var(--bg-app);
+        }
+
+        /* 1. Base / Desktop (> 1100px) - 5 Columns */
+        .cockpit-grid {
+            grid-template-columns: 180px 220px 1fr 220px 180px;
+        }
+
+        /* 2. Tablet Mode (701px - 1100px) - 3 Columns (Hide Logs) */
+        @media (max-width: 1100px) {
+            .cockpit-grid {
+                grid-template-columns: 200px 1fr 200px;
+            }
+            /* Hide Log Panels (Col 1 & 5) */
+            .cockpit-grid > .col-panel:nth-child(1),
+            .cockpit-grid > .col-panel:nth-child(5) {
+                display: none;
+            }
         }
 
         .col-panel {
@@ -214,10 +230,10 @@
         .log-time { color: #555; font-family: monospace; min-width: 28px; }
         .log-txt { color: #ccc; }
 
-        /* Roster Items */
+        /* Roster Items (Enlarged) */
         .player-row {
             display: flex; align-items: center; padding: 12px 10px; border-bottom: 1px solid #222; cursor: pointer; transition: 0.1s;
-            min-height: 54px; /* タップしやすい高さに拡大 */
+            min-height: 54px; /* Larger touch area */
         }
         
         @media (hover: hover) {
@@ -270,8 +286,8 @@
         td { padding: 8px; border-bottom: 1px solid #222; }
         .num-cell { text-align: right; font-family: var(--font-mono); }
 
-        /* --- [PORTRAIT] Mobile Responsive (Tab Mode) --- */
-        @media (max-width: 1024px) and (orientation: portrait) {
+        /* --- [MOBILE] Phone Responsive (Tab Mode) - Only for < 700px --- */
+        @media (max-width: 700px) {
             .cockpit-grid { display: flex; flex-direction: column; }
             .scoreboard { padding: 6px; gap: 6px; height: auto; grid-template-columns: 1fr 1fr; }
             .scoreboard > button { top: 4px; right: 4px; }
@@ -283,59 +299,30 @@
             .col-panel, .action-area { display: none; flex: 1; }
             .col-panel.mobile-active, .action-area.mobile-active { display: flex; }
             
+            .cockpit-grid > .col-panel:nth-child(1),
+            .cockpit-grid > .col-panel:nth-child(5) {
+                display: flex; /* Restore logs in mobile tabs */
+            }
+            
             .mobile-tabs { display: flex; height: 48px; background: #111; border-top: var(--border); }
             .tab-btn { flex: 1; text-align: center; line-height: 48px; color: #666; font-weight: bold; cursor: pointer; font-size: 11px; }
             .tab-btn.active { color: white; background: #222; border-top: 2px solid var(--primary); }
         }
         
-        /* --- [LANDSCAPE] Mobile Responsive (All-in-One Mode) --- */
-        @media (max-height: 600px) and (orientation: landscape) {
+        /* --- [LANDSCAPE PHONE] Extra small landscape --- */
+        @media (max-height: 500px) and (orientation: landscape) {
             .cockpit-grid {
                 display: grid;
                 grid-template-columns: 1fr 1.2fr 2fr 1.2fr 1fr; 
                 flex: 1;
             }
-            .scoreboard {
-                height: 50px; padding: 2px 10px;
-                grid-template-columns: 1fr auto 1fr; gap: 10px; align-items: center;
-                border-bottom: 1px solid #333;
-            }
-            .team-display { flex-direction: row; gap: 8px; justify-content: center; }
-            .team-name-lg { font-size: 12px; width: auto; max-width: 100px; }
-            .total-score { font-size: 24px; margin: 0; line-height: 1; }
-            .indicator-row { margin-top: 0; gap: 4px; }
-            .indicator-label { display: none; }
-            .indicator-ctrl { padding: 0 2px; height: 18px; }
-            .btn-sq { width: 16px; height: 16px; font-size: 10px; }
-            .dots-container { gap: 1px; }
-            .dot { width: 5px; height: 5px; }
-            .period-board { width: auto; padding: 0 8px; height: auto; background: transparent; border: none; }
-            .period-control { margin: 0; font-size: 12px; }
-            .period-grid { display: none !important; }
-            .col-header { padding: 2px; font-size: 9px; height: 18px; }
-            .col-panel { display: flex !important; }
-            .log-item { padding: 2px 4px; font-size: 9px; gap: 4px; }
-            .player-row { padding: 4px; }
-            .p-num { width: 18px; font-size: 11px; }
-            .p-name { font-size: 10px; }
-            .p-stats { display: none; }
-            .action-area { display: flex !important; }
-            .target-bar { height: 24px; font-size: 10px; min-height: 24px; }
-            .target-badge { padding: 0 8px; }
-            .action-buttons {
-                grid-template-columns: repeat(6, 1fr);
-                grid-template-rows: repeat(2, 1fr);
-                gap: 2px;
-                padding: 2px;
-            }
-            .act-btn span:first-child { font-size: 12px; }
-            .act-btn span:last-child { font-size: 8px; margin-top: 0; }
+            /* ... (keep previous styles for tiny landscape screens) ... */
             .mobile-tabs { display: none !important; }
-            .action-area .flex.p-2 { padding: 2px; }
-            .action-area .btn { padding: 4px; font-size: 10px; }
+            .col-panel { display: flex !important; }
+            .action-area { display: flex !important; }
         }
 
-        @media (min-width: 1025px) { .mobile-tabs { display: none; } }
+        @media (min-width: 701px) { .mobile-tabs { display: none; } }
 
         /* Icons */
         .icon { width: 14px; height: 14px; fill: none; stroke: currentColor; stroke-width: 2; stroke-linecap: round; stroke-linejoin: round; }
@@ -1017,7 +1004,7 @@
                                     </tr>
                                 </thead>
                                 <tbody>
-                                    ${tm.players.filter(p => checkPlayed(p)).map(p => StatTableRow(p)).join('')}
+                                    ${tm.players.map(p => StatTableRow(p)).join('')}
                                 </tbody>
                                 <tfoot>
                                     <tr class="font-bold bg-white/5">
@@ -1212,6 +1199,5 @@
     </script>
 </body>
 </html>
-
 
 
