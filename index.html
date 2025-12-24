@@ -342,6 +342,7 @@
 </head>
 <body>
     <div id="root" class="w-full h-full"></div>
+    <input type="file" id="file-import" accept=".csv" style="display:none" onchange="Act.importTeams(event)">
 
     <script>
         // --- Utils ---
@@ -353,6 +354,23 @@
             const d = new Date();
             return `${d.getFullYear()}-${('0' + (d.getMonth() + 1)).slice(-2)}-${('0' + d.getDate()).slice(-2)}`;
         };
+
+        const downloadStringAsFile = (filename, text) => {
+            // Add BOM (Byte Order Mark) for Excel to recognize UTF-8
+            const bom = new Uint8Array([0xEF, 0xBB, 0xBF]);
+            const blob = new Blob([bom, text], {type: 'text/csv;charset=utf-8;'});
+            
+            const link = document.createElement("a");
+            if (link.download !== undefined) {
+                const url = URL.createObjectURL(blob);
+                link.setAttribute("href", url);
+                link.setAttribute("download", filename);
+                link.style.visibility = 'hidden';
+                document.body.appendChild(link);
+                link.click();
+                document.body.removeChild(link);
+            }
+        };
         
         // --- Icons ---
         const Icons = {
@@ -363,6 +381,7 @@
             Minus: `<svg class="icon"><line x1="5" y1="12" x2="19" y2="12"/></svg>`,
             List: `<svg class="icon"><line x1="8" y1="6" x2="21" y2="6"/><line x1="8" y1="12" x2="21" y2="12"/><line x1="8" y1="18" x2="21" y2="18"/><line x1="3" y1="6" x2="3.01" y2="6"/><line x1="3" y1="12" x2="3.01" y2="12"/><line x1="3" y1="18" x2="3.01" y2="18"/></svg>`,
             Download: `<svg class="icon"><path d="M21 15v4a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2v-4"/><polyline points="7 10 12 15 17 10"/><line x1="12" y1="15" x2="12" y2="3"/></svg>`,
+            Upload: `<svg class="icon"><path d="M21 15v4a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2v-4"/><polyline points="17 8 12 3 7 8"/><line x1="12" y1="3" x2="12" y2="15"/></svg>`,
             Exit: `<svg class="icon"><path d="M9 21H5a2 2 0 0 1-2-2V5a2 2 0 0 1 2-2h4"/><polyline points="16 17 21 12 16 7"/><line x1="21" y1="12" x2="9" y2="12"/></svg>`
         };
 
@@ -389,21 +408,27 @@
                 if(dt) State.teams = JSON.parse(dt);
                 else {
                     State.teams = [
-                        {id:genId(), name:'ホームチーム', players:genPlayers()},
-                        {id:genId(), name:'アウェイチーム', players:genPlayers()}
+                        {id:genId(), name:'ホームチーム', players:genPlayers('4-18')},
+                        {id:genId(), name:'アウェイチーム', players:genPlayers('4-18')}
                     ];
                     saveTeams();
                 }
                 if(dh) State.history = JSON.parse(dh);
             } catch (e) {
                 console.error("Data load error", e);
-                State.teams = [{id:genId(), name:'HOME', players:genPlayers()},{id:genId(), name:'AWAY', players:genPlayers()}];
+                State.teams = [{id:genId(), name:'HOME', players:genPlayers('4-18')},{id:genId(), name:'AWAY', players:genPlayers('4-18')}];
             }
         };
         var saveTeams = () => localStorage.setItem('bst_v6_data', JSON.stringify(State.teams));
         var saveHistory = () => localStorage.setItem('bst_v6_history', JSON.stringify(State.history));
         
-        var genPlayers = () => Array.from({length:5}, (_,i)=>({id:genId(), name:`選手 ${4+i}`, number:`${4+i}`})).concat([{id:genId(), name:'控え 10', number:'10'}]);
+        var genPlayers = (mode) => {
+            if(mode === '0-100') {
+                return Array.from({length:101}, (_,i)=>({id:genId(), name:`選手 ${i}`, number:`${i}`}));
+            }
+            // Default 4-18 (15 players)
+            return Array.from({length:15}, (_,i)=>({id:genId(), name:`選手 ${4+i}`, number:`${4+i}`}));
+        };
 
         // --- Actions ---
         var Act = {
@@ -436,8 +461,8 @@
             },
 
             // Team Mgmt
-            createTeam: () => {
-                const newTeam = { id: genId(), name: '新規チーム', players: genPlayers() };
+            createTeam: (mode) => {
+                const newTeam = { id: genId(), name: '新規チーム', players: genPlayers(mode) };
                 State.teams.push(newTeam); saveTeams(); Act.editTeam(newTeam.id);
             },
             editTeam: (id) => { State.editTeamId = id; State.view = 'EDIT_TEAM'; Render(); },
@@ -446,6 +471,58 @@
             addPlayer: () => { State.teams.find(t=>t.id===State.editTeamId).players.push({id:genId(), name:'新規選手', number:''}); saveTeams(); Render(); },
             removePlayer: (pid) => { const t=State.teams.find(t=>t.id===State.editTeamId); t.players=t.players.filter(p=>p.id!==pid); saveTeams(); Render(); },
             updatePlayer: (pid, key, val) => { const t=State.teams.find(t=>t.id===State.editTeamId); const p=t.players.find(p=>p.id===pid); if(p){p[key]=val; saveTeams();} },
+            
+            // Team CSV
+            triggerImport: () => $('#file-import').click(),
+            importTeams: (e) => {
+                const file = e.target.files[0];
+                if(!file) return;
+                const reader = new FileReader();
+                reader.onload = (ev) => {
+                    const text = ev.target.result;
+                    const lines = text.split(/\r\n|\n/);
+                    const newTeams = {};
+                    let count = 0;
+                    lines.forEach((line, i) => {
+                        if(i===0 && line.includes('TEAM_NAME')) return; // header check
+                        const cols = line.split(',');
+                        if(cols.length >= 3) {
+                            const tName = cols[0].trim();
+                            const pNum = cols[1].trim();
+                            const pName = cols[2].trim();
+                            if(tName) {
+                                if(!newTeams[tName]) newTeams[tName] = [];
+                                newTeams[tName].push({id:genId(), number:pNum, name: pName || `選手 ${pNum}`});
+                                count++;
+                            }
+                        }
+                    });
+                    
+                    if(count === 0) return alert('有効なデータが見つかりませんでした');
+                    
+                    Object.keys(newTeams).forEach(k => {
+                        State.teams.push({id:genId(), name:k, players:newTeams[k]});
+                    });
+                    saveTeams();
+                    Render();
+                    alert(`${Object.keys(newTeams).length}チームをインポートしました`);
+                    e.target.value = ''; // Reset input
+                };
+                reader.readAsText(file);
+            },
+            exportTeams: () => {
+                let csv = "TEAM_NAME,NUMBER,PLAYER_NAME\n";
+                State.teams.forEach(t => {
+                    t.players.forEach(p => {
+                        csv += `${t.name},${p.number},${p.name}\n`;
+                    });
+                });
+                copyToClipboard(csv);
+            },
+            downloadTemplate: () => {
+                const csv = "TEAM_NAME,NUMBER,PLAYER_NAME\nサンプルチーム,4,田中 太郎\nサンプルチーム,5,佐藤 次郎";
+                downloadStringAsFile('member_template.csv', csv);
+            },
 
             // Match Logic
             start: () => {
@@ -768,7 +845,21 @@
                         <h2 class="font-bold text-xl">チーム管理</h2>
                         <button onclick="Act.setView('SETUP')" class="btn">戻る</button>
                     </div>
-                    <button onclick="Act.createTeam()" class="btn btn-primary w-full mb-4">+ 新規チーム作成</button>
+                    
+                    <div class="grid grid-cols-2 gap-2 mb-4">
+                        <button onclick="Act.triggerImport()" class="btn border-dashed text-muted text-xs">${Icons.Upload} CSV読込 (追加)</button>
+                        <button onclick="Act.exportTeams()" class="btn border-dashed text-muted text-xs">${Icons.Download} CSV保存 (全件)</button>
+                        <button onclick="Act.downloadTemplate()" class="btn border-dashed text-muted text-xs col-span-2">${Icons.Download} 登録用CSV雛形をダウンロード</button>
+                    </div>
+                    
+                    <div class="flex flex-col gap-2 mb-4 p-2 border border-[#333] rounded bg-card">
+                        <label class="text-xs text-muted font-bold text-center">新規チーム作成 (プリセット選択)</label>
+                        <div class="flex gap-2">
+                            <button onclick="Act.createTeam('4-18')" class="btn btn-primary grow text-xs">No.4 - 18 (15名)</button>
+                            <button onclick="Act.createTeam('0-100')" class="btn btn-primary grow text-xs">No.0 - 100 (101名)</button>
+                        </div>
+                    </div>
+
                     <div class="custom-scrollbar grow">
                         ${State.teams.map(t => `
                             <div class="card mb-2 flex justify-between items-center">
@@ -1105,4 +1196,3 @@
     </script>
 </body>
 </html>
-
