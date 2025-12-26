@@ -6,7 +6,7 @@
     <meta name="theme-color" content="#000000">
     <meta name="apple-mobile-web-app-capable" content="yes">
     <meta name="apple-mobile-web-app-status-bar-style" content="black-translucent">
-    <title>Basketball Stats Pro v8.4</title>
+    <title>Basketball Stats Pro v8.10</title>
     
     <script src="https://cdn.tailwindcss.com"></script>
     <script>
@@ -77,20 +77,14 @@
         .act-btn.make { border-color: #22c55e; color: #22c55e; }
         .act-btn.miss { border-color: #ef4444; color: #ef4444; }
 
-        /* Selected States (Inverted Colors) */
-        .act-btn.selected {
-            transform: translateY(2px);
-            box-shadow: 0 2px 0 #000;
-        }
+        /* Selected States */
+        .act-btn.selected { transform: translateY(2px); box-shadow: 0 2px 0 #000; }
         .act-btn.make.selected { background: #22c55e !important; color: black !important; border-color: #22c55e !important; }
         .act-btn.miss.selected { background: #ef4444 !important; color: black !important; border-color: #ef4444 !important; }
         .act-btn:not(.make):not(.miss).selected { background: #e5e5e5 !important; color: black !important; border-color: #e5e5e5 !important; }
 
         /* --- Portrait Layout --- */
-        .portrait-layout { 
-            display: flex; flex-direction: column; height: 100%; 
-            padding-top: 4px; padding-bottom: 8px; gap: 4px;
-        }
+        .portrait-layout { display: flex; flex-direction: column; height: 100%; padding-top: 4px; padding-bottom: 8px; gap: 4px; }
         .landscape-layout { display: none; }
         
         .p-player-card {
@@ -105,32 +99,18 @@
             .portrait-layout { display: none; }
             .landscape-layout { display: grid; height: 100%; grid-template-rows: auto 1fr; }
             body { padding: 0; }
-            .cockpit-grid {
-                display: grid;
-                grid-template-columns: 200px 220px 1fr 220px 200px;
-                height: 100%; overflow: hidden; background: #000;
-            }
-            @media (max-height: 600px) {
-                .cockpit-grid { grid-template-columns: 1fr 1.4fr 2fr 1.4fr 1fr; }
-            }
+            .cockpit-grid { display: grid; grid-template-columns: 200px 220px 1fr 220px 200px; height: 100%; overflow: hidden; background: #000; }
+            @media (max-height: 600px) { .cockpit-grid { grid-template-columns: 1fr 1.4fr 2fr 1.4fr 1fr; } }
         }
 
         /* --- PRINT STYLES --- */
         @media print {
             @page { size: A4; margin: 5mm 10mm; }
-            body { 
-                background-color: white !important; color: black !important; 
-                height: auto !important; overflow: visible !important; 
-                padding: 0 !important; display: block !important;
-                font-size: 9pt !important; -webkit-print-color-adjust: exact !important; print-color-adjust: exact !important;
-            }
+            body { background-color: white !important; color: black !important; height: auto !important; overflow: visible !important; padding: 0 !important; display: block !important; font-size: 9pt !important; -webkit-print-color-adjust: exact !important; print-color-adjust: exact !important; }
             .no-print { display: none !important; }
             .print-only { display: block !important; }
-            .portrait-layout, .landscape-layout, .setup-view, .history-view { display: none !important; }
-            .report-view { 
-                display: block !important; height: auto !important; overflow: visible !important;
-                background: white !important; color: black !important; padding: 0 !important;
-            }
+            .portrait-layout, .landscape-layout, .setup-view, .history-view, .team-list-view { display: none !important; }
+            .report-view { display: block !important; height: auto !important; overflow: visible !important; background: white !important; color: black !important; padding: 0 !important; }
             .report-container { max-width: 100% !important; margin: 0 !important; padding: 0 !important; min-height: 0 !important; }
             .print-header { margin-bottom: 10px !important; }
             .print-title { font-size: 16pt !important; margin-bottom: 5px !important; }
@@ -168,7 +148,8 @@
             List: `<svg class="icon"><line x1="8" y1="6" x2="21" y2="6"/><line x1="8" y1="12" x2="21" y2="12"/><line x1="8" y1="18" x2="21" y2="18"/><line x1="3" y1="6" x2="3.01" y2="6"/><line x1="3" y1="12" x2="3.01" y2="12"/><line x1="3" y1="18" x2="3.01" y2="18"/></svg>`,
             Exit: `<svg class="icon"><path d="M9 21H5a2 2 0 0 1-2-2V5a2 2 0 0 1 2-2h4"/><polyline points="16 17 21 12 16 7"/><line x1="21" y1="12" x2="9" y2="12"/></svg>`,
             Plus: `<svg class="icon"><line x1="12" y1="5" x2="12" y2="19"/><line x1="5" y1="12" x2="19" y2="12"/></svg>`,
-            Print: `<svg class="icon"><polyline points="6 9 6 2 18 2 18 9"></polyline><path d="M6 18H4a2 2 0 0 1-2-2v-5a2 2 0 0 1 2-2h16a2 2 0 0 1 2 2v5a2 2 0 0 1-2 2h-2"></path><rect x="6" y="14" width="12" height="8"></rect></svg>`
+            Print: `<svg class="icon"><polyline points="6 9 6 2 18 2 18 9"></polyline><path d="M6 18H4a2 2 0 0 1-2-2v-5a2 2 0 0 1 2-2h16a2 2 0 0 1 2 2v5a2 2 0 0 1-2 2h-2"></path><rect x="6" y="14" width="12" height="8"></rect></svg>`,
+            Edit: `<svg class="icon"><path d="M11 4H4a2 2 0 0 0-2 2v14a2 2 0 0 0 2 2h14a2 2 0 0 0 2-2v-7"></path><path d="M18.5 2.5a2.121 2.121 0 0 1 3 3L12 15l-4 1 1-4 9.5-9.5z"></path></svg>`
         };
 
         // --- State ---
@@ -177,7 +158,11 @@
             teams: [], history: [], editTeamId: null, match: null, reportId: null,
             target: { side: null, id: null }, 
             activeAction: null,
-            modals: { sub: false, stats: false, end: false, log: false, period: false }
+            modals: { 
+                sub: false, stats: false, end: false, log: false, period: false,
+                deleteTeam: { active: false, id: null },
+                deleteHist: { active: false, id: null }
+            }
         };
 
         // --- Logic ---
@@ -193,7 +178,6 @@
         const saveHistory = () => localStorage.setItem('bst_v8_history', JSON.stringify(State.history));
         const genPlayers = () => Array.from({length:5}, (_,i)=>({id:genId(), name:`Player ${4+i}`, number:`${4+i}`})).concat([{id:genId(), name:'Bench 10', number:'10'}, {id:genId(), name:'Bench 11', number:'11'}]);
 
-        // Rules
         const getTOLimit = (p) => (p <= 2) ? 2 : (p <= 4 ? 3 : 1);
         const getTOTaken = (m, side) => {
             const history = m.timeouts[side];
@@ -203,25 +187,39 @@
         };
         const getTeamFouls = (m, side) => {
             const p = m.period;
-            return m.log.filter(l => 
-                l.side === side && 
-                (l.txt.includes('PF') || l.txt.includes('FOUL')) && 
-                (p > 4 ? l.period >= 4 : l.period === p)
-            ).length;
+            return m.log.filter(l => l.side === side && (l.txt.includes('PF') || l.txt.includes('FOUL')) && (p > 4 ? l.period >= 4 : l.period === p)).length;
         };
 
         const Act = {
             setView: (v) => { State.view = v; Render(); },
-            // Team Mgmt
-            createTeam: () => { State.teams.push({id:genId(), name:'New Team', players:genPlayers()}); saveTeams(); Act.editTeam(State.teams[State.teams.length-1].id); },
+            
+            createTeam: () => { 
+                const newId = genId();
+                State.teams.push({id:newId, name:'New Team', players:genPlayers()}); 
+                saveTeams(); 
+                Act.editTeam(newId); 
+            },
             editTeam: (id) => { State.editTeamId = id; State.view = 'EDIT_TEAM'; Render(); },
-            deleteTeam: (id) => { if(confirm('Delete Team?')) { State.teams=State.teams.filter(t=>t.id!==id); saveTeams(); Render(); } },
+            
+            // Delete Team Modal Actions
+            confirmDeleteTeam: (id) => { State.modals.deleteTeam = { active: true, id: id }; Render(); },
+            execDeleteTeam: () => {
+                const id = State.modals.deleteTeam.id;
+                if(id) {
+                    State.teams = State.teams.filter(t => t.id !== id);
+                    saveTeams();
+                    if(State.view === 'EDIT_TEAM') State.view = 'TEAM_LIST';
+                }
+                State.modals.deleteTeam = { active: false, id: null };
+                Render();
+            },
+            cancelDeleteTeam: () => { State.modals.deleteTeam = { active: false, id: null }; Render(); },
+
             updateTeamName: (val) => { State.teams.find(t=>t.id===State.editTeamId).name = val; saveTeams(); },
             addPlayer: () => { State.teams.find(t=>t.id===State.editTeamId).players.push({id:genId(), name:'New', number:''}); saveTeams(); Render(); },
             removePlayer: (pid) => { const t=State.teams.find(t=>t.id===State.editTeamId); t.players=t.players.filter(p=>p.id!==pid); saveTeams(); Render(); },
             updatePlayer: (pid, k, v) => { const p=State.teams.find(t=>t.id===State.editTeamId).players.find(p=>p.id===pid); if(p){p[k]=v; saveTeams();} },
 
-            // Game
             start: () => {
                 const hid = $('#sel-home').value;
                 const aid = $('#sel-away').value;
@@ -231,24 +229,15 @@
                     id: genId(), info: { date:$('#inp-date').value, title:$('#inp-title').value },
                     A: { ...h, players: h.players.map(p=>({...p, isOnCourt:true, stats:initStats()})) },
                     B: { ...a, players: a.players.map(p=>({...p, isOnCourt:true, stats:initStats()})) },
-                    log: [], history: [], period: 1, 
-                    timeouts: { A: [], B: [] } 
+                    log: [], history: [], period: 1, timeouts: { A: [], B: [] } 
                 };
                 State.match.A.players.forEach((p,i)=>p.isOnCourt=i<5);
                 State.match.B.players.forEach((p,i)=>p.isOnCourt=i<5);
-                State.view = 'GAME'; 
-                State.target = {side:null,id:null};
-                State.activeAction = null;
-                Object.keys(State.modals).forEach(k=>State.modals[k]=false);
+                State.view = 'GAME'; State.target = {side:null,id:null}; State.activeAction = null;
+                Object.keys(State.modals).forEach(k=> { if(typeof State.modals[k] === 'boolean') State.modals[k]=false; });
                 Render();
             },
-            
-            sel: (s, id) => { 
-                State.target = (State.target.id === id) ? {side:null, id:null} : {side:s, id:id}; 
-                State.activeAction = null;
-                Render(); 
-            },
-            
+            sel: (s, id) => { State.target = (State.target.id === id) ? {side:null, id:null} : {side:s, id:id}; State.activeAction = null; Render(); },
             stat: (k) => {
                 if(!State.target.side) return alert('Select a player first');
                 State.activeAction = k;
@@ -258,7 +247,6 @@
                 const pl = m[s].players.find(p => p.id === State.target.id);
                 const st = pl ? pl.stats : null;
                 let pts = 0;
-                
                 if (k.includes('3PM')) { pts=3; if(st){st.fgm++; st.fga++; st.tpm++; st.tpa++;} }
                 else if (k.includes('3PX')) { if(st){st.fga++; st.tpa++;} }
                 else if (k.includes('2PM')) { pts=2; if(st){st.fgm++; st.fga++;} }
@@ -270,36 +258,30 @@
                 else if (k==='AST') { if(st) st.ast++; }
                 else if (k==='TOV') { if(st) st.tov++; }
                 else if (k==='PF') { if(st) st.pf++; }
-                
                 if(pts > 0 && st) st.pts += pts;
                 m.log.unshift({ id: genId(), time: nowTime(), period: m.period, side: s, pts: pts, txt: `${pl?`#${pl.number}`:m[s].name} ${k}` });
                 Render();
             },
-
-            undo: () => { 
-                if(State.match.history.length) { 
-                    const p = JSON.parse(State.match.history.pop()); 
-                    Object.assign(State.match, {A:p.A, B:p.B, log:p.log, period:p.period, timeouts:p.timeouts}); 
-                    State.activeAction = null;
-                    Render(); 
-                } 
-            },
+            undo: () => { if(State.match.history.length) { const p = JSON.parse(State.match.history.pop()); Object.assign(State.match, {A:p.A, B:p.B, log:p.log, period:p.period, timeouts:p.timeouts}); State.activeAction = null; Render(); } },
             setPeriod: (p) => { State.match.period = p; State.modals.period = false; Render(); },
-            timeout: (side) => {
-                const m = State.match;
-                if (getTOTaken(m, side) >= getTOLimit(m.period)) return;
-                m.history.push(JSON.stringify({A:m.A, B:m.B, log:m.log, period:m.period, timeouts:m.timeouts}));
-                m.timeouts[side].push(m.period);
-                m.log.unshift({ id: genId(), time: nowTime(), period: m.period, side: side, txt: 'TIMEOUT' });
-                Render();
-            },
+            timeout: (side) => { const m=State.match; if (getTOTaken(m, side) >= getTOLimit(m.period)) return; m.history.push(JSON.stringify({A:m.A, B:m.B, log:m.log, period:m.period, timeouts:m.timeouts})); m.timeouts[side].push(m.period); m.log.unshift({ id: genId(), time: nowTime(), period: m.period, side: side, txt: 'TIMEOUT' }); Render(); },
             sub: (s, o, i) => { const t = State.match[s]; t.players.find(p=>p.id===o).isOnCourt=false; t.players.find(p=>p.id===i).isOnCourt=true; State.match.log.unshift({time:nowTime(), period:State.match.period, side:s, txt:`SUB: #${t.players.find(p=>p.id===i).number} IN`}); State.modals.sub=false; window.subOut=null; window.subIn=null; Render(); },
             finish: (s) => { if(s) { const sc = calcScores(State.match); State.history.unshift({ ...State.match, history:[], finalScore: { A: sc.At, B: sc.Bt } }); saveHistory(); } State.match=null; State.view='SETUP'; Render(); },
-            
-            // Report
             viewReport: (id) => { State.reportId = id; Act.setView('REPORT'); },
             printReport: () => { window.print(); },
-            delHist: (id) => { if(confirm('Delete?')) { State.history=State.history.filter(h=>h.id!==id); saveHistory(); Render(); } }
+            
+            // Delete History Modal Actions
+            confirmDeleteHist: (id) => { State.modals.deleteHist = { active: true, id: id }; Render(); },
+            execDeleteHist: () => {
+                const id = State.modals.deleteHist.id;
+                if(id) {
+                    State.history = State.history.filter(h => h.id !== id);
+                    saveHistory();
+                }
+                State.modals.deleteHist = { active: false, id: null };
+                Render();
+            },
+            cancelDeleteHist: () => { State.modals.deleteHist = { active: false, id: null }; Render(); }
         };
 
         const initStats = () => ({pts:0, fgm:0, fga:0, tpm:0, tpa:0, ftm:0, fta:0, orb:0, drb:0, ast:0, tov:0, pf:0});
@@ -309,43 +291,108 @@
         const Render = () => {
             const root = $('#root');
             if(State.view === 'SETUP') return root.innerHTML = SetupView();
+            if(State.view === 'TEAM_LIST') return root.innerHTML = TeamListView();
+            if(State.view === 'EDIT_TEAM') return root.innerHTML = TeamEditView();
             if(State.view === 'HISTORY') return root.innerHTML = HistoryListView();
             if(State.view === 'REPORT') return root.innerHTML = ReportView();
-            if(State.view === 'EDIT_TEAM') return root.innerHTML = TeamEditView();
             if(State.view === 'GAME') return root.innerHTML = GameView();
         };
 
-        const SetupView = () => `
-            <div class="setup-view h-full flex items-center justify-center p-6 bg-black">
-                <div class="w-full max-w-md bg-panel border border-[#333] rounded-xl p-6 shadow-2xl">
-                    <h1 class="text-3xl font-black mb-8 text-center text-white italic tracking-tighter">BASKETBALL <span class="text-primary">STATS PRO</span></h1>
-                    <div class="space-y-4 mb-8">
-                        <div>
-                            <label class="text-xs text-gray-500 font-bold">INFO</label>
-                            <div class="flex flex-col gap-2 mt-1">
-                                <input id="inp-date" type="date" value="${today()}" class="bg-black border border-[#333] rounded p-2 w-full">
-                                <input id="inp-title" value="Game" placeholder="Match Title" class="bg-black border border-[#333] rounded p-2 w-full">
-                            </div>
-                        </div>
-                        <div>
-                            <label class="text-xs text-gray-500 font-bold">MATCHUP</label>
-                            <div class="flex gap-2 items-center mt-1">
-                                <select id="sel-home" class="bg-black border border-[#333] rounded p-3 flex-1 text-primary font-bold">${State.teams.map(t=>`<option value="${t.id}">${t.name}</option>`)}</select>
-                                <span class="text-gray-600 font-black">VS</span>
-                                <select id="sel-away" class="bg-black border border-[#333] rounded p-3 flex-1 text-secondary font-bold">${State.teams.map(t=>`<option value="${t.id}">${t.name}</option>`)}</select>
-                            </div>
-                        </div>
-                    </div>
-                    <button onclick="Act.start()" class="btn w-full p-4 bg-primary text-white text-lg font-bold mb-4 shadow-lg shadow-blue-900/30">START GAME</button>
-                    <div class="grid grid-cols-2 gap-3 border-t border-[#333] pt-6">
-                        <button onclick="Act.createTeam()" class="btn py-3 bg-card text-gray-400 hover:bg-[#222]">TEAMS</button>
-                        <button onclick="Act.setView('HISTORY')" class="btn py-3 bg-card text-gray-400 hover:bg-[#222]">HISTORY</button>
+        // --- Modal Components ---
+        const DeleteTeamModal = () => !State.modals.deleteTeam.active ? '' : `
+            <div class="fixed inset-0 z-50 bg-black/80 flex items-center justify-center p-4 backdrop-blur">
+                <div class="bg-card border border-[#333] p-6 rounded-lg w-80 text-center shadow-2xl">
+                    <h3 class="font-bold text-xl mb-4 text-white">チームを削除しますか？</h3>
+                    <div class="flex flex-col gap-2">
+                        <button onclick="Act.execDeleteTeam()" class="btn w-full p-3 bg-red-600 text-white font-bold hover:bg-red-500">削除する</button>
+                        <button onclick="Act.cancelDeleteTeam()" class="btn w-full p-3 bg-transparent border border-[#444] text-gray-400 hover:text-white">キャンセル</button>
                     </div>
                 </div>
             </div>
         `;
 
+        const DeleteHistModal = () => !State.modals.deleteHist.active ? '' : `
+            <div class="fixed inset-0 z-50 bg-black/80 flex items-center justify-center p-4 backdrop-blur">
+                <div class="bg-card border border-[#333] p-6 rounded-lg w-80 text-center shadow-2xl">
+                    <h3 class="font-bold text-xl mb-4 text-white">履歴を削除しますか？</h3>
+                    <div class="flex flex-col gap-2">
+                        <button onclick="Act.execDeleteHist()" class="btn w-full p-3 bg-red-600 text-white font-bold hover:bg-red-500">削除する</button>
+                        <button onclick="Act.cancelDeleteHist()" class="btn w-full p-3 bg-transparent border border-[#444] text-gray-400 hover:text-white">キャンセル</button>
+                    </div>
+                </div>
+            </div>
+        `;
+
+        const SetupView = () => `
+            <div class="setup-view h-full flex items-center justify-center p-4 bg-black">
+                <div class="w-full max-w-md bg-panel border border-[#333] rounded-xl p-6 shadow-2xl flex flex-col gap-6">
+                    <div class="text-center">
+                        <h1 class="text-3xl font-black text-white italic tracking-tighter mb-1">BASKETBALL <span class="text-primary">STATS PRO</span></h1>
+                        <p class="text-xs text-gray-600 font-mono tracking-widest">ADVANCED SCOREBOARD v8.10</p>
+                    </div>
+                    <div>
+                        <label class="text-[10px] text-gray-500 font-bold tracking-wider mb-2 block">GAME INFO</label>
+                        <div class="bg-card border border-[#333] rounded-lg p-1 flex flex-col gap-1">
+                            <input id="inp-date" type="date" value="${today()}" class="bg-transparent text-white p-3 text-sm border-b border-[#333] focus:bg-white/5 outline-none w-full font-mono">
+                            <input id="inp-title" value="Training Match" placeholder="Enter Match Title" class="bg-transparent text-white p-3 text-sm focus:bg-white/5 outline-none w-full font-bold">
+                        </div>
+                    </div>
+                    <div>
+                        <label class="text-[10px] text-gray-500 font-bold tracking-wider mb-2 block">MATCHUP</label>
+                        <div class="flex items-center gap-2">
+                            <div class="flex-1 min-w-0"><select id="sel-home" class="w-full bg-card border border-[#333] rounded-lg p-3 text-primary font-bold text-center appearance-none focus:border-primary outline-none text-sm truncate">${State.teams.map(t=>`<option value="${t.id}">${t.name}</option>`)}</select></div>
+                            <div class="font-black text-gray-600 text-sm italic">VS</div>
+                            <div class="flex-1 min-w-0"><select id="sel-away" class="w-full bg-card border border-[#333] rounded-lg p-3 text-secondary font-bold text-center appearance-none focus:border-secondary outline-none text-sm truncate">${State.teams.map(t=>`<option value="${t.id}">${t.name}</option>`)}</select></div>
+                        </div>
+                    </div>
+                    <button onclick="Act.start()" class="btn w-full py-4 bg-gradient-to-r from-blue-600 to-blue-500 text-white text-lg font-black shadow-lg shadow-blue-900/20 hover:scale-[1.02] active:scale-[0.98] transition-all border border-blue-400/20">START GAME</button>
+                    <div class="grid grid-cols-2 gap-3 pt-2">
+                        <button onclick="Act.setView('TEAM_LIST')" class="btn py-3 bg-card border border-[#333] text-gray-400 hover:bg-[#222] text-xs font-bold flex flex-col gap-1"><span class="text-lg opacity-50">👥</span>TEAMS</button>
+                        <button onclick="Act.setView('HISTORY')" class="btn py-3 bg-card border border-[#333] text-gray-400 hover:bg-[#222] text-xs font-bold flex flex-col gap-1"><span class="text-lg opacity-50">📜</span>HISTORY</button>
+                    </div>
+                </div>
+            </div>
+        `;
+
+        const TeamListView = () => `
+            ${DeleteTeamModal()}
+            <div class="team-list-view h-full flex flex-col bg-panel">
+                <div class="p-4 border-b border-[#333] flex justify-between items-center bg-black">
+                    <h2 class="font-bold">TEAM MANAGEMENT</h2>
+                    <button onclick="Act.setView('SETUP')" class="btn px-4 bg-[#333]">BACK</button>
+                </div>
+                <div class="flex-1 overflow-y-auto p-4 custom-scrollbar">
+                    <button onclick="Act.createTeam()" class="btn w-full p-3 bg-white/5 border border-[#333] text-primary font-bold mb-4 hover:bg-white/10">+ CREATE NEW TEAM</button>
+                    ${State.teams.map(t => `
+                        <div class="bg-card border border-[#333] rounded-lg p-3 mb-3 flex flex-col gap-3">
+                            <div class="font-bold text-lg text-white">${t.name}</div>
+                            <div class="flex gap-2 w-full">
+                                <button onclick="Act.editTeam('${t.id}')" class="btn flex-1 bg-blue-900/20 text-blue-400 border border-blue-900/50 hover:bg-blue-900/40 text-xs font-bold py-3">EDIT</button>
+                                <button onclick="Act.confirmDeleteTeam('${t.id}')" class="btn flex-1 bg-red-900/20 text-red-400 border border-red-900/50 hover:bg-red-900/40 text-xs font-bold py-3">DELETE</button>
+                            </div>
+                        </div>
+                    `).join('')}
+                </div>
+            </div>
+        `;
+
+        const TeamEditView = () => {
+            const t = State.teams.find(x => x.id === State.editTeamId);
+            return `
+            ${DeleteTeamModal()}
+            <div class="flex flex-col h-full bg-panel">
+                <div class="p-4 border-b border-[#333] flex justify-between items-center bg-black sticky top-0 z-10"><h2 class="font-bold">EDIT TEAM</h2><button onclick="Act.setView('TEAM_LIST')" class="btn px-4 py-1 bg-success text-black font-bold text-sm">DONE</button></div>
+                <div class="p-4 flex-1 overflow-hidden flex flex-col max-w-2xl mx-auto w-full">
+                    <div class="mb-4"><label class="text-xs text-gray-500">TEAM NAME</label><input value="${t.name}" oninput="Act.updateTeamName(this.value)" class="text-lg font-bold mt-1 bg-black border border-[#333] rounded p-2 w-full focus:border-primary"></div>
+                    <div class="flex justify-between items-center mb-2 mt-2"><span class="text-xs text-gray-500 font-bold">ROSTER (${t.players.length})</span><button onclick="Act.addPlayer()" class="btn px-3 py-1 text-xs bg-white/10 hover:bg-white/20">${Icons.Plus} ADD</button></div>
+                    <div class="custom-scrollbar flex-1 -mx-2 px-2">${t.players.map(p => `<div class="flex items-center gap-2 mb-2 bg-card p-2 rounded border border-[#333]"><input value="${p.number}" placeholder="#" onchange="Act.updatePlayer('${p.id}','number',this.value)" class="w-12 text-center font-mono font-bold bg-black border border-[#444] rounded p-1 focus:border-primary"><input value="${p.name}" placeholder="Name" onchange="Act.updatePlayer('${p.id}','name',this.value)" class="flex-1 bg-transparent border-none focus:bg-black focus:border-b p-1"><button onclick="Act.removePlayer('${p.id}')" class="btn text-gray-500 hover:text-red-500 p-2">${Icons.Trash}</button></div>`).join('')}</div>
+                    <button onclick="Act.confirmDeleteTeam('${t.id}')" class="mt-4 btn w-full p-3 border border-red-900/50 text-red-500 hover:bg-red-900/10">DELETE TEAM</button>
+                </div>
+            </div>`;
+        };
+
         const HistoryListView = () => `
+            ${DeleteHistModal()}
             <div class="history-view h-full flex flex-col bg-panel">
                 <div class="p-4 border-b border-[#333] flex justify-between items-center bg-black">
                     <h2 class="font-bold">MATCH HISTORY</h2>
@@ -353,20 +400,7 @@
                 </div>
                 <div class="flex-1 overflow-y-auto p-4 custom-scrollbar">
                     ${State.history.length===0 ? '<div class="text-center text-gray-500 mt-8">No games saved.</div>' : ''}
-                    ${State.history.map(h => `
-                        <div class="bg-card border border-[#333] rounded-lg p-4 mb-3 flex justify-between items-center hover:bg-[#222] cursor-pointer" onclick="Act.viewReport('${h.id}')">
-                            <div>
-                                <div class="text-xs text-gray-500">${h.info.date}</div>
-                                <div class="font-bold mb-1">${h.info.title}</div>
-                                <div class="flex gap-3 text-sm font-mono">
-                                    <span class="text-primary font-bold">${h.A.name}</span>
-                                    <span class="bg-black px-2 rounded border border-[#333]">${h.finalScore.A} - ${h.finalScore.B}</span>
-                                    <span class="text-secondary font-bold">${h.B.name}</span>
-                                </div>
-                            </div>
-                            <div class="text-gray-500 text-xs">VIEW ></div>
-                        </div>
-                    `).join('')}
+                    ${State.history.map(h => `<div class="bg-card border border-[#333] rounded-lg p-4 mb-3 flex justify-between items-center hover:bg-[#222] cursor-pointer" onclick="Act.viewReport('${h.id}')"><div><div class="text-xs text-gray-500">${h.info.date}</div><div class="font-bold mb-1">${h.info.title}</div><div class="flex gap-3 text-sm font-mono"><span class="text-primary font-bold">${h.A.name}</span><span class="bg-black px-2 rounded border border-[#333]">${h.finalScore.A} - ${h.finalScore.B}</span><span class="text-secondary font-bold">${h.B.name}</span></div></div><div class="flex items-center gap-2"><div class="text-gray-500 text-xs mr-2">VIEW ></div><button onclick="event.stopPropagation(); Act.confirmDeleteHist('${h.id}')" class="btn p-2 text-gray-500 hover:text-red-500 z-10">${Icons.Trash}</button></div></div>`).join('')}
                 </div>
             </div>
         `;
@@ -374,140 +408,14 @@
         const ReportView = () => {
             const m = State.history.find(h => h.id === State.reportId);
             if(!m) return Act.setView('HISTORY');
-            
             const sc = m.finalScore.detail || calcScores(m);
-            
             const BoxScoreTable = (side) => {
                 const tm = m[side];
-                const rows = tm.players.map(p => {
-                    const s = p.stats;
-                    if(s.pts+s.fga+s.pf+s.tov === 0 && !p.isOnCourt) return ''; 
-                    return `<tr>
-                        <td class="font-mono text-center">${p.number}</td>
-                        <td class="font-bold truncate" style="max-width:100px;">${p.name}</td>
-                        <td class="text-right font-bold">${s.pts}</td>
-                        <td class="text-right">${s.orb+s.drb}</td>
-                        <td class="text-right">${s.ast}</td>
-                        <td class="text-right">${s.tov}</td>
-                        <td class="text-right">${s.fgm}/${s.fga}</td>
-                        <td class="text-right text-xs text-gray-400 print-text-black">${pct(s.fgm,s.fga)}%</td>
-                        <td class="text-right">${s.tpm}/${s.tpa}</td>
-                        <td class="text-right text-xs text-gray-400 print-text-black">${pct(s.tpm,s.tpa)}%</td>
-                        <td class="text-right">${s.ftm}/${s.fta}</td>
-                        <td class="text-right text-xs text-gray-400 print-text-black">${pct(s.ftm,s.fta)}%</td>
-                        <td class="text-right">${s.pf}</td>
-                    </tr>`;
-                }).join('');
-                
-                const t = tm.players.reduce((a,p)=>{
-                    const s=p.stats; a.pts+=s.pts; a.reb+=(s.orb+s.drb); a.ast+=s.ast; a.tov+=s.tov;
-                    a.fgm+=s.fgm; a.fga+=s.fga; a.tpm+=s.tpm; a.tpa+=s.tpa; a.ftm+=s.ftm; a.fta+=s.fta; a.pf+=s.pf; return a;
-                }, {pts:0,reb:0,ast:0,tov:0,fgm:0,fga:0,tpm:0,tpa:0,ftm:0,fta:0,pf:0});
-
-                return `
-                    <div class="mb-6 report-card">
-                        <div class="report-card-title font-bold text-lg mb-2 border-b-2 ${side==='A'?'border-blue-500 text-blue-500 print-text-black':'border-red-500 text-red-500 print-text-black'}">${tm.name}</div>
-                        <table class="w-full text-sm text-left">
-                            <thead class="bg-[#222] text-gray-300 print-bg-gray">
-                                <tr>
-                                    <th class="p-1">#</th><th class="p-1">Name</th><th class="p-1 text-right">PTS</th><th class="p-1 text-right">RB</th><th class="p-1 text-right">AS</th><th class="p-1 text-right">TO</th>
-                                    <th class="p-1 text-right">FG</th><th class="p-1 text-right">%</th>
-                                    <th class="p-1 text-right">3P</th><th class="p-1 text-right">%</th>
-                                    <th class="p-1 text-right">FT</th><th class="p-1 text-right">%</th>
-                                    <th class="p-1 text-right">PF</th>
-                                </tr>
-                            </thead>
-                            <tbody>
-                                ${rows}
-                            </tbody>
-                            <tfoot class="font-bold bg-[#222] print-bg-gray">
-                                <tr>
-                                    <td colspan="2" class="text-center">TOTAL</td>
-                                    <td class="text-right">${t.pts}</td><td class="text-right">${t.reb}</td><td class="text-right">${t.ast}</td><td class="text-right">${t.tov}</td>
-                                    <td class="text-right">${t.fgm}/${t.fga}</td><td class="text-right">${pct(t.fgm,t.fga)}%</td>
-                                    <td class="text-right">${t.tpm}/${t.tpa}</td><td class="text-right">${pct(t.tpm,t.tpa)}%</td>
-                                    <td class="text-right">${t.ftm}/${t.fta}</td><td class="text-right">${pct(t.ftm,t.fta)}%</td>
-                                    <td class="text-right">${t.pf}</td>
-                                </tr>
-                            </tfoot>
-                        </table>
-                    </div>
-                `;
+                const rows = tm.players.map(p => { const s=p.stats; if(s.pts+s.fga+s.pf+s.tov===0 && !p.isOnCourt) return ''; return `<tr><td class="font-mono text-center">${p.number}</td><td class="font-bold truncate" style="max-width:100px;">${p.name}</td><td class="text-right font-bold">${s.pts}</td><td class="text-right">${s.orb+s.drb}</td><td class="text-right">${s.ast}</td><td class="text-right">${s.tov}</td><td class="text-right">${s.fgm}/${s.fga}</td><td class="text-right text-xs text-gray-400 print-text-black">${pct(s.fgm,s.fga)}%</td><td class="text-right">${s.tpm}/${s.tpa}</td><td class="text-right text-xs text-gray-400 print-text-black">${pct(s.tpm,s.tpa)}%</td><td class="text-right">${s.ftm}/${s.fta}</td><td class="text-right text-xs text-gray-400 print-text-black">${pct(s.ftm,s.fta)}%</td><td class="text-right">${s.pf}</td></tr>`; }).join('');
+                const t = tm.players.reduce((a,p)=>{ const s=p.stats; a.pts+=s.pts; a.reb+=(s.orb+s.drb); a.ast+=s.ast; a.tov+=s.tov; a.fgm+=s.fgm; a.fga+=s.fga; a.tpm+=s.tpm; a.tpa+=s.tpa; a.ftm+=s.ftm; a.fta+=s.fta; a.pf+=s.pf; return a; }, {pts:0,reb:0,ast:0,tov:0,fgm:0,fga:0,tpm:0,tpa:0,ftm:0,fta:0,pf:0});
+                return `<div class="mb-6 report-card"><div class="report-card-title font-bold text-lg mb-2 border-b-2 ${side==='A'?'border-blue-500 text-blue-500 print-text-black':'border-red-500 text-red-500 print-text-black'}">${tm.name}</div><table class="w-full text-sm text-left"><thead class="bg-[#222] text-gray-300 print-bg-gray"><tr><th class="p-1">#</th><th class="p-1">Name</th><th class="p-1 text-right">PTS</th><th class="p-1 text-right">RB</th><th class="p-1 text-right">AS</th><th class="p-1 text-right">TO</th><th class="p-1 text-right">FG</th><th class="p-1 text-right">%</th><th class="p-1 text-right">3P</th><th class="p-1 text-right">%</th><th class="p-1 text-right">FT</th><th class="p-1 text-right">%</th><th class="p-1 text-right">PF</th></tr></thead><tbody>${rows}</tbody><tfoot class="font-bold bg-[#222] print-bg-gray"><tr><td colspan="2" class="text-center">TOTAL</td><td class="text-right">${t.pts}</td><td class="text-right">${t.reb}</td><td class="text-right">${t.ast}</td><td class="text-right">${t.tov}</td><td class="text-right">${t.fgm}/${t.fga}</td><td class="text-right">${pct(t.fgm,t.fga)}%</td><td class="text-right">${t.tpm}/${t.tpa}</td><td class="text-right">${pct(t.tpm,t.tpa)}%</td><td class="text-right">${t.ftm}/${t.fta}</td><td class="text-right">${pct(t.ftm,t.fta)}%</td><td class="text-right">${t.pf}</td></tr></tfoot></table></div>`;
             };
-
-            return `
-                <div class="report-view h-full flex flex-col bg-panel overflow-auto custom-scrollbar">
-                    <div class="no-print p-4 border-b border-[#333] flex justify-between items-center bg-black sticky top-0 z-10">
-                        <div class="font-bold">GAME REPORT</div>
-                        <div class="flex gap-2">
-                            <button onclick="Act.printReport()" class="btn px-4 bg-success text-black font-bold text-sm">${Icons.Print} Print / PDF</button>
-                            <button onclick="Act.setView('HISTORY')" class="btn px-4 bg-[#333]">CLOSE</button>
-                        </div>
-                    </div>
-                    
-                    <div class="report-container p-6 max-w-4xl mx-auto w-full bg-white text-black min-h-screen">
-                        <div class="print-header text-center mb-6">
-                            <div class="print-date text-sm text-gray-600 mb-1">${m.info.date}</div>
-                            <h1 class="print-title text-2xl font-black uppercase mb-4">${m.info.title}</h1>
-                            
-                            <div class="print-scoreboard flex items-center justify-center gap-8 mb-6 border-b border-gray-300 pb-6">
-                                <div class="print-team-name text-xl font-bold text-blue-600 print-text-black text-right flex-1">${m.A.name}</div>
-                                <div class="print-score-val text-4xl font-mono font-black whitespace-nowrap mx-2">${m.finalScore.A} - ${m.finalScore.B}</div>
-                                <div class="print-team-name text-xl font-bold text-red-600 print-text-black text-left flex-1">${m.B.name}</div>
-                            </div>
-                            
-                            <div class="print-period-container flex justify-center mb-8">
-                                <table class="print-period-table w-auto text-sm border border-gray-300">
-                                    <thead class="bg-gray-100">
-                                        <tr><th class="px-4 py-1">Team</th><th>Q1</th><th>Q2</th><th>Q3</th><th>Q4</th><th>OT</th></tr>
-                                    </thead>
-                                    <tbody>
-                                        <tr><td class="font-bold px-4">${m.A.name}</td><td>${sc.A[0]}</td><td>${sc.A[1]}</td><td>${sc.A[2]}</td><td>${sc.A[3]}</td><td>${sc.A[4]}</td></tr>
-                                        <tr><td class="font-bold px-4">${m.B.name}</td><td>${sc.B[0]}</td><td>${sc.B[1]}</td><td>${sc.B[2]}</td><td>${sc.B[3]}</td><td>${sc.B[4]}</td></tr>
-                                    </tbody>
-                                </table>
-                            </div>
-                        </div>
-
-                        ${BoxScoreTable('A')}
-                        ${BoxScoreTable('B')}
-                        
-                        <div class="print-footer mt-8 text-center text-xs text-gray-400 pt-4 border-t">Generated by Basketball Stats Pro</div>
-                    </div>
-                </div>
-            `;
-        };
-
-        const TeamEditView = () => {
-            const t = State.teams.find(x => x.id === State.editTeamId);
-            return `
-            <div class="flex flex-col h-full bg-panel">
-                <div class="p-4 border-b border-[#333] flex justify-between items-center bg-black sticky top-0 z-10">
-                    <h2 class="font-bold">EDIT TEAM</h2>
-                    <button onclick="Act.setView('SETUP')" class="btn px-4 py-1 bg-success text-black font-bold text-sm">DONE</button>
-                </div>
-                <div class="p-4 flex-1 overflow-hidden flex flex-col max-w-2xl mx-auto w-full">
-                    <div class="mb-4">
-                        <label class="text-xs text-gray-500">TEAM NAME</label>
-                        <input value="${t.name}" oninput="Act.updateTeamName(this.value)" class="text-lg font-bold mt-1 bg-black border border-[#333] rounded p-2 w-full focus:border-primary">
-                    </div>
-                    <div class="flex justify-between items-center mb-2 mt-2">
-                        <span class="text-xs text-gray-500 font-bold">ROSTER</span>
-                        <button onclick="Act.addPlayer()" class="btn px-3 py-1 text-xs bg-white/10 hover:bg-white/20">${Icons.Plus} ADD</button>
-                    </div>
-                    <div class="custom-scrollbar flex-1 -mx-2 px-2">
-                        ${t.players.map(p => `
-                            <div class="flex items-center gap-2 mb-2 bg-card p-2 rounded border border-[#333]">
-                                <input value="${p.number}" placeholder="#" onchange="Act.updatePlayer('${p.id}','number',this.value)" class="w-12 text-center font-mono font-bold bg-black border border-[#444] rounded p-1 focus:border-primary">
-                                <input value="${p.name}" placeholder="Name" onchange="Act.updatePlayer('${p.id}','name',this.value)" class="flex-1 bg-transparent border-none focus:bg-black focus:border-b p-1">
-                                <button onclick="Act.removePlayer('${p.id}')" class="btn text-gray-500 hover:text-red-500 p-2">${Icons.Trash}</button>
-                            </div>
-                        `).join('')}
-                    </div>
-                    <button onclick="Act.deleteTeam('${t.id}');Act.setView('SETUP')" class="mt-4 btn w-full p-3 border border-red-900/50 text-red-500 hover:bg-red-900/10">DELETE TEAM</button>
-                </div>
-            </div>
-            `;
+            return `<div class="report-view h-full flex flex-col bg-panel overflow-auto custom-scrollbar"><div class="no-print p-4 border-b border-[#333] flex justify-between items-center bg-black sticky top-0 z-10"><div class="font-bold">GAME REPORT</div><div class="flex gap-2"><button onclick="Act.printReport()" class="btn px-4 bg-success text-black font-bold text-sm">${Icons.Print} Print / PDF</button><button onclick="Act.setView('HISTORY')" class="btn px-4 bg-[#333]">CLOSE</button></div></div><div class="report-container p-6 max-w-4xl mx-auto w-full bg-white text-black min-h-screen"><div class="print-header text-center mb-6"><div class="print-date text-sm text-gray-600 mb-1">${m.info.date}</div><h1 class="print-title text-2xl font-black uppercase mb-4">${m.info.title}</h1><div class="print-scoreboard flex items-center justify-center gap-8 mb-6 border-b border-gray-300 pb-6"><div class="print-team-name text-xl font-bold text-blue-600 print-text-black text-right flex-1">${m.A.name}</div><div class="print-score-val text-4xl font-mono font-black whitespace-nowrap mx-2">${m.finalScore.A} - ${m.finalScore.B}</div><div class="print-team-name text-xl font-bold text-red-600 print-text-black text-left flex-1">${m.B.name}</div></div><div class="print-period-container flex justify-center mb-8"><table class="print-period-table w-auto text-sm border border-gray-300"><thead class="bg-gray-100"><tr><th class="px-4 py-1">Team</th><th>Q1</th><th>Q2</th><th>Q3</th><th>Q4</th><th>OT</th></tr></thead><tbody><tr><td class="font-bold px-4">${m.A.name}</td><td>${sc.A[0]}</td><td>${sc.A[1]}</td><td>${sc.A[2]}</td><td>${sc.A[3]}</td><td>${sc.A[4]}</td></tr><tr><td class="font-bold px-4">${m.B.name}</td><td>${sc.B[0]}</td><td>${sc.B[1]}</td><td>${sc.B[2]}</td><td>${sc.B[3]}</td><td>${sc.B[4]}</td></tr></tbody></table></div></div>${BoxScoreTable('A')}${BoxScoreTable('B')}<div class="print-footer mt-8 text-center text-xs text-gray-400 pt-4 border-t">Generated by Basketball Stats Pro</div></div></div>`;
         };
 
         const GameView = () => {
@@ -515,49 +423,18 @@
             const t = State.target;
             const sc = calcScores(m);
             const activeP = t.id ? (m.A.players.find(p=>p.id===t.id) || m.B.players.find(p=>p.id===t.id)) : null;
-
-            const Indicators = (label, current, max, colorClass, align) => `
-                <div class="flex items-center gap-1 ${align==='right'?'flex-row-reverse':''}">
-                    <div class="text-[9px] font-bold text-gray-500 w-4 text-center">${label}</div>
-                    <div class="flex gap-1">
-                        ${Array.from({length:max}).map((_,i) => `<div class="w-3 h-3 rounded-full border border-[#444] ${i < current ? colorClass : 'bg-[#1a1a1a]'}"></div>`).join('')}
-                    </div>
-                </div>
-            `;
+            const Indicators = (label, current, max, colorClass, align) => `<div class="flex items-center gap-1 ${align==='right'?'flex-row-reverse':''}"><div class="text-[9px] font-bold text-gray-500 w-4 text-center">${label}</div><div class="flex gap-1">${Array.from({length:max}).map((_,i) => `<div class="w-3 h-3 rounded-full border border-[#444] ${i < current ? colorClass : 'bg-[#1a1a1a]'}"></div>`).join('')}</div></div>`;
             const TimeoutBtn = (side, align) => `<div onclick="Act.timeout('${side}')" class="cursor-pointer p-1 rounded hover:bg-white/5 active:bg-white/10 transition-colors">${Indicators('TO', getTOTaken(m, side), getTOLimit(m.period), 'bg-blue-500 border-blue-500 shadow-[0_0_4px_#3b82f6]', align)}</div>`;
             const FoulDisplay = (side, align) => Indicators('TF', getTeamFouls(m, side), 4, 'bg-red-500 border-red-500 shadow-[0_0_4px_#ef4444]', align);
             const PeriodLabel = (p) => p > 4 ? `OT${p-4}` : `Q${p}`;
-
-            // --- Helper to generate Action Buttons with Active State ---
             const ActionBtn = (key, label, sub, type='') => {
                 const isActive = State.activeAction === key ? 'selected' : '';
-                return `<button onclick="Act.stat('${key}')" class="act-btn ${type} ${isActive} col-span-1 row-span-1"><span class="text-${type==='make'||type==='miss'?'xl':'lg'} font-black ${type==='make'?'italic':type==='miss'?'italic text-gray-500':''}">${label}</span><span class="text-[9px] ${type==='miss'?'text-gray-500':''}">${sub}</span></button>`;
+                return `<button onclick="Act.stat('${key}', this)" class="act-btn ${type} ${isActive} col-span-1 row-span-1"><span class="text-${type==='make'||type==='miss'?'xl':'lg'} font-black ${type==='make'?'italic':type==='miss'?'italic text-gray-500':''}">${label}</span><span class="text-[9px] ${type==='miss'?'text-gray-500':''}">${sub}</span></button>`;
             };
-
-            const ActionGrid = `
-                <div class="grid grid-cols-4 grid-rows-3 gap-2 h-full">
-                    ${ActionBtn('3PM', '3P', 'MAKE', 'make')}
-                    ${ActionBtn('2PM', '2P', 'MAKE', 'make')}
-                    ${ActionBtn('FTM', 'FT', 'MAKE', 'make')}
-                    ${ActionBtn('ORB', 'ORB', '', 'text-gray-300 hover:bg-[#333]')}
-
-                    ${ActionBtn('3PX', '3P', 'MISS', 'miss')}
-                    ${ActionBtn('2PX', '2P', 'MISS', 'miss')}
-                    ${ActionBtn('FTX', 'FT', 'MISS', 'miss')}
-                    ${ActionBtn('DRB', 'DRB', '', 'text-gray-300 hover:bg-[#333]')}
-
-                    ${ActionBtn('AST', 'AST', '', 'text-accent hover:bg-[#333] border-accent/30')}
-                    ${ActionBtn('TOV', 'TO', '', 'text-gray-400 hover:bg-[#333]')}
-                    ${ActionBtn('PF', 'PF', '', 'text-red-500 hover:bg-[#333] border-red-900/50')}
-                    <button onclick="State.modals.sub=true;Render()" class="act-btn text-gray-500 hover:bg-[#333] border-gray-800"><span class="text-lg font-bold">SUB</span></button>
-                </div>
-            `;
-            
+            const ActionGrid = `<div class="grid grid-cols-4 grid-rows-3 gap-2 h-full">${ActionBtn('3PM', '3P', 'MAKE', 'make')}${ActionBtn('2PM', '2P', 'MAKE', 'make')}${ActionBtn('FTM', 'FT', 'MAKE', 'make')}${ActionBtn('ORB', 'ORB', '', 'text-gray-300 hover:bg-[#333]')}${ActionBtn('3PX', '3P', 'MISS', 'miss')}${ActionBtn('2PX', '2P', 'MISS', 'miss')}${ActionBtn('FTX', 'FT', 'MISS', 'miss')}${ActionBtn('DRB', 'DRB', '', 'text-gray-300 hover:bg-[#333]')}${ActionBtn('AST', 'AST', '', 'text-accent hover:bg-[#333] border-accent/30')}${ActionBtn('TOV', 'TO', '', 'text-gray-400 hover:bg-[#333]')}${ActionBtn('PF', 'PF', '', 'text-red-500 hover:bg-[#333] border-red-900/50')}<button onclick="State.modals.sub=true;Render()" class="act-btn text-gray-500 hover:bg-[#333] border-gray-800"><span class="text-lg font-bold">SUB</span></button></div>`;
             const Controls = `<div class="flex gap-1 h-full"><button onclick="Act.undo()" class="btn flex-1 bg-card hover:bg-white/10 text-gray-400">${Icons.Undo}</button><button onclick="State.modals.stats=true;Render()" class="btn flex-1 bg-card hover:bg-white/10 text-gray-400">STATS</button><button onclick="State.modals.log=true;Render()" class="btn flex-1 bg-card hover:bg-white/10 text-gray-400">LOG</button><button onclick="State.modals.end=true;Render()" class="btn flex-1 bg-card hover:bg-white/10 text-red-800">${Icons.Exit}</button></div>`;
             const PRoster = (side) => `<div class="horizontal-scroll gap-2 p-2 h-full items-center bg-[#111] border-b border-[#333] ${side==='A'?'border-t border-[#333]':''}"><div class="flex-shrink-0 w-8 flex items-center justify-center font-bold text-xs ${side==='A'?'text-primary':'text-secondary'} writing-mode-vertical" style="writing-mode: vertical-rl;">${side==='A'?'HOME':'AWAY'}</div>${m[side].players.filter(p=>p.isOnCourt).map(p=>`<div onclick="Act.sel('${side}','${p.id}')" class="p-player-card ${t.id===p.id?'active bg-'+(side==='A'?'primary':'secondary'):''}"><div class="font-mono font-bold text-lg leading-none">${p.number}</div><div class="text-[9px] truncate w-14 text-center text-gray-400 leading-tight">${p.name}</div>${p.stats.pf>0 ? `<div class="absolute top-0 right-0 w-2 h-2 rounded-full ${p.stats.pf>=4?'bg-red-500':'bg-yellow-500'}"></div>`:''}</div>`).join('')}<button onclick="State.target.side='${side}';State.modals.sub=true;Render()" class="p-player-card border-dashed opacity-50"><span class="text-[10px]">SUB</span></button></div>`;
             const LRoster = (side) => m[side].players.filter(p=>p.isOnCourt).map(p => `<div onclick="Act.sel('${side}','${p.id}')" class="p-2 border-b border-[#333] flex items-center gap-2 cursor-pointer ${t.id===p.id? (side==='A'?'bg-primary':'bg-secondary') : 'hover:bg-[#222]'}"><div class="font-mono font-bold w-6 text-center text-gray-400">${p.number}</div><div class="flex-1 font-bold text-xs truncate">${p.name}</div><div class="text-[10px] font-mono text-gray-500">P:${p.stats.pts} F:${p.stats.pf}</div></div>`).join('');
-
-            // Modals
             const PeriodModal = () => !State.modals.period ? '' : `<div class="fixed inset-0 z-50 bg-black/90 flex items-center justify-center p-4 backdrop-blur-sm" onclick="if(event.target===this){State.modals.period=false;Render()}"><div class="bg-card w-full max-w-xs rounded-lg border border-[#444] p-4"><h3 class="text-center font-bold mb-4 text-gray-400">SELECT PERIOD</h3><div class="grid grid-cols-2 gap-2">${[1,2,3,4,5,6].map(p=>`<button onclick="Act.setPeriod(${p})" class="btn p-4 border border-[#333] font-black text-xl hover:bg-white/10 ${m.period===p?'bg-primary text-white border-primary':''}">${p>4?'OT'+(p-4):'Q'+p}</button>`).join('')}</div></div></div>`;
             const SubModal = () => !State.modals.sub ? '' : `<div class="fixed inset-0 z-50 bg-black/90 flex items-center justify-center p-4" onclick="if(event.target===this){State.modals.sub=false;Render()}"><div class="bg-card w-full max-w-sm rounded-lg border border-[#444] flex flex-col max-h-[80vh]"><div class="p-3 border-b border-[#333] font-bold text-center">SUBSTITUTION</div><div class="flex-1 overflow-y-auto p-2"><div class="text-xs text-center mb-1 text-red-400">OUT (ON COURT)</div><div class="grid grid-cols-2 gap-2 mb-4">${(m[t.side||'A']).players.filter(p=>p.isOnCourt).map(p=>`<button onclick="window.subOut='${p.id}';this.style.borderColor='red'" class="btn border border-[#333] p-2 bg-black justify-between"><span class="font-mono text-lg">${p.number}</span><span class="text-xs truncate ml-2">${p.name}</span></button>`).join('')}</div><div class="text-xs text-center mb-1 text-blue-400">IN (BENCH)</div><div class="grid grid-cols-2 gap-2">${(m[t.side||'A']).players.filter(p=>!p.isOnCourt).map(p=>`<button onclick="window.subIn='${p.id}';this.style.borderColor='#3b82f6'" class="btn border border-[#333] p-2 bg-black justify-between"><span class="font-mono text-lg">${p.number}</span><span class="text-xs truncate ml-2">${p.name}</span></button>`).join('')}</div></div><button onclick="if(window.subOut&&window.subIn)Act.sub('${t.side||'A'}',window.subOut,window.subIn)" class="p-4 bg-white text-black font-bold m-2 rounded">CONFIRM</button></div></div>`;
             const LogModal = () => !State.modals.log ? '' : `<div class="fixed inset-0 z-50 bg-black/90 flex flex-col p-4 animate-fade-in"><div class="flex justify-between items-center mb-4"><h2 class="font-bold">GAME LOG</h2><button onclick="State.modals.log=false;Render()" class="btn px-4 bg-[#333]">CLOSE</button></div><div class="flex-1 overflow-y-auto custom-scrollbar">${m.log.map(l=>`<div class="border-b border-[#222] py-2 flex gap-2 text-xs"><span class="font-mono text-gray-500">${l.time}</span><span class="font-bold ${l.side==='A'?'text-primary':'text-secondary'}">${l.side}</span> <span class="flex-1">${l.txt}</span> ${l.pts?`<span class="text-white font-bold">+${l.pts}</span>`:''}</div>`).join('')}</div></div>`;
@@ -575,16 +452,12 @@
                     </div>
                     <div class="h-20 bg-black shrink-0">${PRoster('A')}</div>
                     <div class="flex-1 flex flex-col bg-black min-h-0 rounded-lg mx-1 border border-[#222]">
-                        <div class="h-8 flex items-center justify-center border-b border-[#333] bg-[#1a1a1a] rounded-t-lg shrink-0">
-                            ${activeP ? `<span class="px-3 py-0.5 rounded text-xs font-bold ${t.side==='A'?'bg-primary text-white':'bg-secondary text-white'}">#${activeP.number} ${activeP.name}</span>` : `<span class="text-[10px] text-gray-600 tracking-widest">SELECT PLAYER</span>`}
-                            ${m.log.length>0 ? `<span class="absolute right-2 text-[9px] text-gray-500 truncate max-w-[100px]">${m.log[0].txt}</span>`:''}
-                        </div>
+                        <div class="h-8 flex items-center justify-center border-b border-[#333] bg-[#1a1a1a] rounded-t-lg shrink-0">${activeP ? `<span class="px-3 py-0.5 rounded text-xs font-bold ${t.side==='A'?'bg-primary text-white':'bg-secondary text-white'}">#${activeP.number} ${activeP.name}</span>` : `<span class="text-[10px] text-gray-600 tracking-widest">SELECT PLAYER</span>`}${m.log.length>0 ? `<span class="absolute right-2 text-[9px] text-gray-500 truncate max-w-[100px]">${m.log[0].txt}</span>`:''}</div>
                         <div class="flex-1 p-2 overflow-hidden">${ActionGrid}</div>
                         <div class="h-12 p-2 border-t border-[#333] shrink-0">${Controls}</div>
                     </div>
                     <div class="h-20 bg-black shrink-0">${PRoster('B')}</div>
                 </div>
-
                 <div class="landscape-layout">
                     <div class="bg-panel border-b border-[#333] h-14 grid grid-cols-3 px-4 items-center gap-4">
                         <div class="flex items-center gap-3"><div class="font-bold text-primary truncate text-sm w-32">${m.A.name}</div><div class="flex flex-col gap-1 border-l border-[#333] pl-3">${TimeoutBtn('A')}${FoulDisplay('A')}</div></div>
@@ -595,9 +468,7 @@
                         <div class="border-r border-[#333] flex flex-col"><div class="bg-[#111] text-[10px] text-center text-gray-500 py-1">HOME LOG</div><div class="flex-1 custom-scrollbar bg-panel text-[10px] p-1">${m.log.filter(l=>l.side==='A').map(l=>`<div class="border-b border-[#222] py-1 text-gray-400">${l.time} ${l.txt}</div>`).join('')}</div></div>
                         <div class="border-r border-[#333] flex flex-col"><div class="bg-[#111] text-[10px] text-center text-gray-500 py-1">HOME ROSTER</div><div class="flex-1 custom-scrollbar bg-panel">${LRoster('A')}</div></div>
                         <div class="flex flex-col bg-black">
-                             <div class="h-8 flex items-center justify-center border-b border-[#333] bg-[#1a1a1a]">
-                                ${activeP ? `<span class="px-3 py-0.5 rounded text-xs font-bold ${t.side==='A'?'bg-primary text-white':'bg-secondary text-white'}">#${activeP.number} ${activeP.name}</span>` : `<span class="text-[10px] text-gray-600 tracking-widest">SELECT PLAYER</span>`}
-                            </div>
+                             <div class="h-8 flex items-center justify-center border-b border-[#333] bg-[#1a1a1a]">${activeP ? `<span class="px-3 py-0.5 rounded text-xs font-bold ${t.side==='A'?'bg-primary text-white':'bg-secondary text-white'}">#${activeP.number} ${activeP.name}</span>` : `<span class="text-[10px] text-gray-600 tracking-widest">SELECT PLAYER</span>`}</div>
                             <div class="flex-1 p-4">${ActionGrid}</div>
                             <div class="h-12 p-2 border-t border-[#333]">${Controls}</div>
                         </div>
