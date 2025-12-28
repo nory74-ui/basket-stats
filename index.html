@@ -6,7 +6,7 @@
     <meta name="theme-color" content="#000000">
     <meta name="apple-mobile-web-app-capable" content="yes">
     <meta name="apple-mobile-web-app-status-bar-style" content="black-translucent">
-    <title>Basketball Stats Pro v9.1</title>
+    <title>Basketball Stats Pro v9.3</title>
     
     <script src="https://cdn.tailwindcss.com"></script>
     <script>
@@ -165,9 +165,9 @@
                 sub: false, stats: false, end: false, log: false, period: false,
                 deleteTeam: { active: false, id: null },
                 deleteHist: { active: false, id: null },
-                restoreConfirm: false // New for Backup
+                restoreConfirm: false
             },
-            pendingRestoreData: null // New for Backup
+            pendingRestoreData: null
         };
 
         // --- Logic ---
@@ -185,12 +185,7 @@
 
         // Backup Logic
         const backupData = () => {
-            const data = {
-                version: "9.1",
-                exportedAt: new Date().toISOString(),
-                teams: State.teams,
-                history: State.history
-            };
+            const data = { version: "9.3", exportedAt: new Date().toISOString(), teams: State.teams, history: State.history };
             const blob = new Blob([JSON.stringify(data, null, 2)], {type: 'application/json'});
             const url = URL.createObjectURL(blob);
             const a = document.createElement('a');
@@ -216,12 +211,12 @@
                         State.modals.restoreConfirm = true;
                         Render();
                     } else {
-                        alert('Invalid backup file format.');
+                        alert('無効なファイル形式です。');
                     }
                 } catch (err) {
-                    alert('Failed to parse file.');
+                    alert('ファイルの読み込みに失敗しました。');
                 }
-                event.target.value = ''; // Reset input
+                event.target.value = '';
             };
             reader.readAsText(file);
         };
@@ -234,7 +229,7 @@
                 saveHistory();
                 State.pendingRestoreData = null;
                 State.modals.restoreConfirm = false;
-                alert('Data restored successfully!');
+                alert('データを復元しました！');
                 Render();
             }
         };
@@ -303,7 +298,83 @@
         const DeleteHistModal = () => !State.modals.deleteHist.active ? '' : `<div class="fixed inset-0 z-50 bg-black/80 flex items-center justify-center p-4 backdrop-blur"><div class="bg-card border border-[#333] p-6 rounded-lg w-80 text-center shadow-2xl"><h3 class="font-bold text-xl mb-4 text-white">履歴を削除しますか？</h3><div class="flex flex-col gap-2"><button onclick="Act.execDeleteHist()" class="btn w-full p-3 bg-red-600 text-white font-bold hover:bg-red-500">削除する</button><button onclick="Act.cancelDeleteHist()" class="btn w-full p-3 bg-transparent border border-[#444] text-gray-400 hover:text-white">キャンセル</button></div></div></div>`;
         const RestoreConfirmModal = () => !State.modals.restoreConfirm ? '' : `<div class="fixed inset-0 z-50 bg-black/80 flex items-center justify-center p-4 backdrop-blur"><div class="bg-card border border-[#333] p-6 rounded-lg w-80 text-center shadow-2xl"><h3 class="font-bold text-xl mb-2 text-white">データを復元しますか？</h3><p class="text-sm text-red-400 mb-4">現在のデータは全て上書きされ、元に戻すことはできません。</p><div class="flex flex-col gap-2"><button onclick="execRestore()" class="btn w-full p-3 bg-red-600 text-white font-bold hover:bg-red-500">復元する (上書き)</button><button onclick="cancelRestore()" class="btn w-full p-3 bg-transparent border border-[#444] text-gray-400 hover:text-white">キャンセル</button></div></div></div>`;
 
-        const ManualView = () => `... (Same as v9.0, adding backup section) ...`; // Shortened for brevity, use v9.0 content
+        // --- Manual Content with iOS/Offline Info ---
+        const ManualView = () => `
+            <div class="manual-view h-full flex flex-col bg-panel">
+                <div class="p-4 border-b border-[#333] flex justify-between items-center bg-black sticky top-0 z-10">
+                    <h2 class="font-bold">取扱説明書</h2>
+                    <button onclick="Act.setView('SETUP')" class="btn px-4 bg-[#333]">閉じる</button>
+                </div>
+                <div class="flex-1 overflow-y-auto p-6 custom-scrollbar text-gray-300">
+                    <div class="max-w-2xl mx-auto space-y-8 pb-20">
+                        <div class="bg-card p-5 rounded-lg border border-l-4 border-[#333] border-l-green-500">
+                            <h3 class="font-bold text-white text-lg mb-2">💡 オフライン動作について</h3>
+                            <p class="text-sm leading-relaxed">
+                                このアプリは<strong>単一のHTMLファイル</strong>で構成されており、一度ファイルを開けばインターネット接続がない環境でも動作します。<br>
+                                体育館など電波の届きにくい場所でも問題なく利用可能です。
+                            </p>
+                        </div>
+
+                        <div class="bg-card p-5 rounded-lg border border-l-4 border-[#333] border-l-red-500">
+                            <h3 class="font-bold text-white text-lg mb-2">⚠️ iOS (iPhone/iPad) でのご利用について</h3>
+                            <p class="text-sm leading-relaxed">
+                                iPhoneやiPadで、ダウンロードしたHTMLファイルを直接開くと、<strong>データの保存ができないなど正常に動作しない場合があります</strong>。<br><br>
+                                <strong>推奨される利用方法:</strong><br>
+                                このHTMLファイルをWebサーバー（GitHub Pagesなど）にアップロードし、SafariでそのURLにアクセスしてご利用ください。<br>
+                                Safariのメニューから<strong>「ホーム画面に追加」</strong>を行うと、アプリのように全画面で快適に利用できます。
+                            </p>
+                        </div>
+
+                        <div>
+                            <h3 class="font-bold text-xl text-primary mb-3 border-b border-[#333] pb-2">📱 アプリとして使う</h3>
+                            <p class="text-sm mb-3">ブラウザの「ホーム画面に追加」機能を使うことで、アドレスバーを消して全画面で利用できます。</p>
+                            <div class="grid grid-cols-1 md:grid-cols-2 gap-4">
+                                <div class="bg-[#1a1a1a] p-3 rounded"><strong class="text-white block mb-1">🍎 iPhone / iPad (Safari)</strong><ol class="list-decimal pl-4 text-xs space-y-1"><li>(Webサーバー上のページを開いた状態で)</li><li>画面下部（iPadは右上）の<span class="inline-block bg-[#333] px-1 rounded">共有アイコン</span>をタップ</li><li>メニューから「ホーム画面に追加」を選択</li><li>右上の「追加」をタップ</li></ol></div>
+                                <div class="bg-[#1a1a1a] p-3 rounded"><strong class="text-white block mb-1">🤖 Android (Chrome)</strong><ol class="list-decimal pl-4 text-xs space-y-1"><li>右上の<span class="inline-block bg-[#333] px-1 rounded">︙</span>メニューをタップ</li><li>「ホーム画面に追加」または「アプリをインストール」を選択</li><li>指示に従って追加</li></ol></div>
+                            </div>
+                        </div>
+
+                        <div>
+                            <h3 class="font-bold text-xl text-primary mb-3 border-b border-[#333] pb-2">📂 データのバックアップと復元</h3>
+                            <p class="text-sm mb-3">万が一の端末故障や機種変更に備えて、定期的にバックアップを取ることをお勧めします。</p>
+                            <div class="space-y-4">
+                                <div class="bg-[#1a1a1a] p-3 rounded">
+                                    <h4 class="font-bold text-white text-sm mb-2">💾 保存 (バックアップ)</h4>
+                                    <ol class="list-decimal pl-4 text-xs space-y-1 text-gray-300">
+                                        <li>スタート画面下部の「保存 (Export)」ボタンを押します。</li>
+                                        <li><code>basketball_stats_backup_日付.json</code> というファイルがダウンロードされます。</li>
+                                        <li>このファイルをGoogle DriveやiCloud、PCなどに保存してください。</li>
+                                    </ol>
+                                </div>
+                                <div class="bg-[#1a1a1a] p-3 rounded">
+                                    <h4 class="font-bold text-white text-sm mb-2">📥 復元 (インポート)</h4>
+                                    <ol class="list-decimal pl-4 text-xs space-y-1 text-gray-300">
+                                        <li>スタート画面下部の「復元 (Import)」ボタンを押します。</li>
+                                        <li>保存しておいたJSONファイルを選択します。</li>
+                                        <li>確認画面で「復元する」を押すと、データが上書きされます。</li>
+                                        <li class="text-red-400">※現在のデータは全て消去され、バックアップの内容に置き換わりますのでご注意ください。</li>
+                                    </ol>
+                                </div>
+                            </div>
+                        </div>
+
+                        <div>
+                            <h3 class="font-bold text-xl text-primary mb-3 border-b border-[#333] pb-2">📖 用語解説</h3>
+                            <div class="overflow-x-auto"><table class="w-full text-sm text-left border-collapse"><thead class="bg-[#222] text-gray-400"><tr><th class="p-2 border border-[#444]">ボタン</th><th class="p-2 border border-[#444]">意味</th><th class="p-2 border border-[#444]">解説</th></tr></thead><tbody class="divide-y divide-[#333]"><tr><td class="p-2 border border-[#444] font-bold text-green-400">3PM</td><td class="p-2 border border-[#444]">3 Point Made</td><td class="p-2 border border-[#444]">3点シュート成功</td></tr><tr><td class="p-2 border border-[#444] font-bold text-red-400">3PX</td><td class="p-2 border border-[#444]">3 Point Miss</td><td class="p-2 border border-[#444]">3点シュート失敗</td></tr><tr><td class="p-2 border border-[#444] font-bold text-green-400">2PM</td><td class="p-2 border border-[#444]">2 Point Made</td><td class="p-2 border border-[#444]">2点シュート成功</td></tr><tr><td class="p-2 border border-[#444] font-bold text-red-400">2PX</td><td class="p-2 border border-[#444]">2 Point Miss</td><td class="p-2 border border-[#444]">2点シュート失敗</td></tr><tr><td class="p-2 border border-[#444] font-bold text-green-400">FTM</td><td class="p-2 border border-[#444]">Free Throw Made</td><td class="p-2 border border-[#444]">フリースロー成功 (1点)</td></tr><tr><td class="p-2 border border-[#444] font-bold text-red-400">FTX</td><td class="p-2 border border-[#444]">Free Throw Miss</td><td class="p-2 border border-[#444]">フリースロー失敗</td></tr><tr><td class="p-2 border border-[#444] font-bold">ORB</td><td class="p-2 border border-[#444]">Offense Rebound</td><td class="p-2 border border-[#444]">味方のシュートミスを拾う</td></tr><tr><td class="p-2 border border-[#444] font-bold">DRB</td><td class="p-2 border border-[#444]">Defense Rebound</td><td class="p-2 border border-[#444]">相手のシュートミスを拾う</td></tr><tr><td class="p-2 border border-[#444] font-bold text-accent">AST</td><td class="p-2 border border-[#444]">Assist</td><td class="p-2 border border-[#444]">味方の得点につながるパス</td></tr><tr><td class="p-2 border border-[#444] font-bold text-gray-400">TOV</td><td class="p-2 border border-[#444]">Turnover</td><td class="p-2 border border-[#444]">ミスで相手ボールになること</td></tr><tr><td class="p-2 border border-[#444] font-bold text-red-500">PF</td><td class="p-2 border border-[#444]">Personal Foul</td><td class="p-2 border border-[#444]">ファウル</td></tr></tbody></table></div>
+                        </div>
+
+                        <div>
+                            <h3 class="font-bold text-xl text-primary mb-3 border-b border-[#333] pb-2">🎮 入力の流れ（具体例）</h3>
+                            <div class="space-y-4">
+                                <div class="bg-[#1a1a1a] p-3 rounded"><h4 class="font-bold text-white text-sm mb-2">ケース1：シュートが決まった</h4><p class="text-xs text-gray-400">シューターを選択 ➔ <span class="text-green-400 font-bold">2PM</span> or <span class="text-green-400 font-bold">3PM</span></p><p class="text-xs text-gray-500 mt-1">※アシストがついた場合は、続けてアシストした選手を選択 ➔ <span class="text-accent font-bold">AST</span></p></div>
+                                <div class="bg-[#1a1a1a] p-3 rounded"><h4 class="font-bold text-white text-sm mb-2">ケース2：シュートが外れてリバウンド</h4><p class="text-xs text-gray-400">シューターを選択 ➔ <span class="text-red-400 font-bold">2PX</span> or <span class="text-red-400 font-bold">3PX</span></p><p class="text-xs text-gray-400 mt-1">リバウンドを取った選手を選択 ➔ <span class="text-white font-bold">ORB</span> (攻) or <span class="text-white font-bold">DRB</span> (守)</p></div>
+                                <div class="bg-[#1a1a1a] p-3 rounded"><h4 class="font-bold text-white text-sm mb-2">ケース3：選手交代</h4><p class="text-xs text-gray-400">画面中央右下の <span class="text-white font-bold">SUB</span> ボタンを押す</p><p class="text-xs text-gray-400 mt-1">コートから出る選手(赤)と、ベンチから出る選手(青)を1名ずつ選択して確定</p></div>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        `;
 
         const SetupView = () => `
             ${RestoreConfirmModal()}
@@ -316,7 +387,7 @@
                 <div class="w-full max-w-md bg-panel border border-[#333] rounded-xl p-6 shadow-2xl flex flex-col gap-6 max-h-full overflow-y-auto">
                     <div class="text-center">
                         <h1 class="text-3xl font-black text-white italic tracking-tighter mb-1">BASKETBALL <span class="text-primary">STATS PRO</span></h1>
-                        <p class="text-xs text-gray-600 font-mono tracking-widest">ADVANCED SCOREBOARD v9.1</p>
+                        <p class="text-xs text-gray-600 font-mono tracking-widest">ADVANCED SCOREBOARD v9.3</p>
                     </div>
                     <div>
                         <label class="text-[10px] text-gray-500 font-bold tracking-wider mb-2 block">GAME INFO</label>
@@ -339,7 +410,6 @@
                         <button onclick="Act.setView('HISTORY')" class="btn py-3 bg-card border border-[#333] text-gray-400 hover:bg-[#222] text-xs font-bold flex flex-col gap-1"><span class="text-lg opacity-50">📜</span>HISTORY</button>
                     </div>
                     
-                    <!-- Backup Section -->
                     <div class="border-t border-[#333] pt-4 mt-2">
                         <label class="text-[10px] text-gray-600 font-bold tracking-wider mb-2 block text-center">DATA BACKUP</label>
                         <div class="flex gap-2">
@@ -351,10 +421,6 @@
             </div>
         `;
 
-        // ... (ManualView content with backup info added) ...
-        // For brevity, I'll update the ManualView content in the actual code block below to include backup info.
-
-        // Reuse previous views...
         const TeamListView = () => `
             ${DeleteTeamModal()}
             <div class="team-list-view h-full flex flex-col bg-panel">
@@ -364,11 +430,18 @@
                 </div>
                 <div class="flex-1 overflow-y-auto p-4 custom-scrollbar">
                     <button onclick="Act.createTeam()" class="btn w-full p-3 bg-white/5 border border-[#333] text-primary font-bold mb-4 hover:bg-white/10">+ CREATE NEW TEAM</button>
-                    ${State.teams.map(t => `<div class="bg-card border border-[#333] rounded-lg p-3 mb-3 flex flex-col gap-3"><div class="font-bold text-lg text-white">${t.name}</div><div class="flex gap-2 w-full"><button onclick="Act.editTeam('${t.id}')" class="btn flex-1 bg-blue-900/20 text-blue-400 border border-blue-900/50 hover:bg-blue-900/40 text-xs font-bold py-3">EDIT</button><button onclick="Act.confirmDeleteTeam('${t.id}')" class="btn flex-1 bg-red-900/20 text-red-400 border border-red-900/50 hover:bg-red-900/40 text-xs font-bold py-3">DELETE</button></div></div>`).join('')}
+                    ${State.teams.map(t => `
+                        <div class="bg-card border border-[#333] rounded-lg p-3 mb-3 flex flex-col gap-3">
+                            <div class="font-bold text-lg text-white">${t.name}</div>
+                            <div class="flex gap-2 w-full">
+                                <button onclick="Act.editTeam('${t.id}')" class="btn flex-1 bg-blue-900/20 text-blue-400 border border-blue-900/50 hover:bg-blue-900/40 text-xs font-bold py-3">EDIT</button>
+                                <button onclick="Act.confirmDeleteTeam('${t.id}')" class="btn flex-1 bg-red-900/20 text-red-400 border border-red-900/50 hover:bg-red-900/40 text-xs font-bold py-3">DELETE</button>
+                            </div>
+                        </div>
+                    `).join('')}
                 </div>
             </div>
         `;
-        // ... (TeamEditView, HistoryListView, ReportView, GameView same as v8.11, included in full response below)
 
         const TeamEditView = () => {
             const t = State.teams.find(x => x.id === State.editTeamId);
@@ -478,3 +551,4 @@
     </script>
 </body>
 </html>
+
